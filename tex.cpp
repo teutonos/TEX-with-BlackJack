@@ -1,10 +1,12 @@
 #include <iostream>
 
 #include "tex.h"
+#include "operators.h"
 
 void Formula::parse(std::vector<Token>* input,
                     int index,
-                    TokType last)
+                    TokType last
+                    )
 {
   int current = 0;
   for (int i = index; (*input)[i].type != last; i++)
@@ -84,7 +86,14 @@ Node::Node(std::wstring str = L"")
 
 Unary::Unary(std::wstring str): Operation(str)
 {
-  actual = NULL;
+  if (str == L"integral")
+  {
+    actual = new Integral(L"∫");
+  }
+  else
+  {
+    actual = NULL;
+  }
   operand = NULL;
 }
 
@@ -105,7 +114,7 @@ Node::~Node()
 Formula::Formula(std::vector<Token>* input,
                  int index,
                  TokType last
-                ): Node()
+                 ): Node()
 {
   parse(input, index, last);
 }
@@ -159,12 +168,24 @@ void Formula::enTree(std::vector<Node*>* stack, int index)
 void unary::Prefix::enTree(std::vector<Node*>* stack, int index)
 {
   operand = (*stack)[index + 1];
+  if (actual != NULL)
+  {
+    actual->setOperand(operand);
+    actual->setSubScript(subscript);
+    actual->setSuperScript(supscript);
+  }
   operand->setUse();
 }
 
 void unary::Postfix::enTree(std::vector<Node*>* stack, int index)
 {
   operand = (*stack)[index - 1];
+  if (actual != NULL)
+  {
+    actual->setOperand(operand);
+    actual->setSubScript(subscript);
+    actual->setSuperScript(supscript);
+  }
   operand->setUse();
 }
 
@@ -172,6 +193,13 @@ void binary::Prefix::enTree(std::vector<Node*>* stack, int index)
 {
   leftOperand = (*stack)[index + 1];
   rightOperand = (*stack)[index + 2];
+  if (actual != NULL)
+  {
+    actual->setLeft(leftOperand);
+    actual->setRight(rightOperand);
+    actual->setSubScript(subscript);
+    actual->setSuperScript(supscript);
+  }
   leftOperand->setUse();
   rightOperand->setUse();
 }
@@ -213,6 +241,13 @@ void binary::Infix::enTree(std::vector<Node*>* stack, int index)
 {
   leftOperand = (*stack)[index - 1];
   rightOperand = (*stack)[index + 1];
+  if (actual != NULL)
+  {
+    actual->setLeft(leftOperand);
+    actual->setRight(rightOperand);
+    actual->setSubScript(subscript);
+    actual->setSuperScript(supscript);
+  }
   leftOperand->setUse();
   rightOperand->setUse();
 }
@@ -221,6 +256,13 @@ void binary::Postfix::enTree(std::vector<Node*>* stack, int index)
 {
   leftOperand = (*stack)[index - 2];
   rightOperand = (*stack)[index - 1];
+  if (actual != NULL)
+  {
+    actual->setLeft(leftOperand);
+    actual->setRight(rightOperand);
+    actual->setSubScript(subscript);
+    actual->setSuperScript(supscript);
+  }
   leftOperand->setUse();
   rightOperand->setUse();
 }
@@ -229,17 +271,12 @@ Unary::~Unary()
 {
   if (actual != NULL)
     delete actual;
-  delete operand;
 }
 
 Binary::~Binary()
 {
   if (actual != NULL)
     delete actual;
-  if (leftOperand != NULL)
-    delete leftOperand;
-  if (rightOperand != NULL)
-    delete rightOperand;
 }
 
 std::wstring Node::putScripts()
