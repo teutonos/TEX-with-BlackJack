@@ -4,7 +4,7 @@
 
 void Formula::parse(std::vector<Token>* input,
                     int index,
-                    TokenType last)
+                    TokType last)
 {
   int current = 0;
   for (int i = index; (*input)[i].type != last; i++)
@@ -73,14 +73,22 @@ void Formula::parse(std::vector<Token>* input,
   }
 }
 
-Node::Node(std::string str = "")
+Node::Node(std::wstring str = L"")
 {
   subscript = supscript = NULL;
   name = str;
   used = false;
+  width = 0;
+  height = 0;
 }
 
-Binary::Binary(std::string str): Operation(str)
+Unary::Unary(std::wstring str): Operation(str)
+{
+  actual = NULL;
+  operand = NULL;
+}
+
+Binary::Binary(std::wstring str): Operation(str)
 {
   actual = NULL;
   leftOperand = rightOperand = NULL;
@@ -96,7 +104,8 @@ Node::~Node()
 
 Formula::Formula(std::vector<Token>* input,
                  int index,
-                 TokenType last)
+                 TokType last
+                ): Node()
 {
   parse(input, index, last);
 }
@@ -174,7 +183,7 @@ void Node::checkScript(std::vector<Node*>* stack, int index)
 
 void binary::Infix::checkScript(std::vector<Node*>* stack, int index)
 {
-  if (name == "superscript")
+  if (name == L"superscript")
   {
     (*stack)[index - 1]->setSuperScript((*stack)[index + 1]);
     delete (*stack)[index];
@@ -186,7 +195,7 @@ void binary::Infix::checkScript(std::vector<Node*>* stack, int index)
     }
     return;
   }
-  if (name == "subscript")
+  if (name == L"subscript")
   {
     (*stack)[index - 1]->setSubScript((*stack)[index + 1]);
     delete (*stack)[index];
@@ -233,9 +242,9 @@ Binary::~Binary()
     delete rightOperand;
 }
 
-std::string Node::putScripts()
+std::wstring Node::putScripts()
 {
-  std::string tmp = "";
+  std::wstring tmp = L"";
   if ((supscript != NULL) || (subscript != NULL))
   {
     tmp += '[';
@@ -243,7 +252,7 @@ std::string Node::putScripts()
     {
       tmp += supscript->put();
     }
-    tmp += ", ";
+    tmp += L", ";
     if (subscript != NULL)
     {
       tmp += subscript->put();
@@ -253,43 +262,44 @@ std::string Node::putScripts()
   return tmp;
 }
 
-std::string Formula::put()
+std::wstring Formula::put()
 {
-  std::string tmp = "{";
+  std::wstring tmp = L"{";
   for (int i = 0; i < content.size(); i++)
   {
-    tmp += content[i]->put() + "; ";
+    tmp += content[i]->put() + L"; ";
   }
-  tmp += "\b\b}" + putScripts();
+  tmp = tmp.substr(0, tmp.length()-2);
+  tmp += L"}" + putScripts();
   return tmp;
 }
 
-std::string Lexem::put()
+std::wstring Lexem::put()
 {
-  return  "'" +
+  return  //"'" +
           name +
-          "'" +
+          //"'" +
           putScripts();
 }
 
-std::string Unary::put()
+std::wstring Unary::put()
 {
   return  getName() +
           putScripts() +
-          "(" +
+          L"(" +
           getOperand()->put() +
-          ")";
+          L")";
 }
 
-std::string Binary::put()
+std::wstring Binary::put()
 {
   return  getName() +
           putScripts() +
-          "(" +
+          L"(" +
           getLeft()->put() +
-          ", " +
+          L", " +
           getRight()->put() +
-          ")";
+          L")";
 }
 
 void Node::setSuperScript(Node* n)

@@ -18,16 +18,14 @@
 struct Token;
 class Formula;
 
-//blah
-
 namespace tokenizer
 {
-  extern std::vector<std::string> keywords;
+  extern std::vector<std::wstring> keywords;
   extern std::vector<Token> keyTokens;
   void init();
 };
 
-enum TokenType
+enum TokType
 {
   UNKNOWN, EMPTY, SYMBOL, UNARY, BINARY,
   OPEN_BRACKET, CLOSE_BRACKET, ENDLINE
@@ -50,19 +48,19 @@ enum OpKind
 
 struct Token
 {
-  TokenType type;
+  TokType type;
   Place pos;
   int number;
   OpKind kind;
-  std::string varName;
+  std::wstring varName;
 
-  Token(TokenType t, Place p, OpKind k, std::string name);
+  Token(TokType t, Place p, OpKind k, std::wstring name);
   Token();
 };
 
-std::vector<std::string>* parseString(std::string str);
-std::vector<Token>* tokenize(std::string str);
-Formula* makeTreeStack(std::string str);
+std::vector<std::wstring>* parseString(std::wstring str);
+std::vector<Token>* tokenize(std::wstring str);
+Formula* makeTreeStack(std::wstring str);
 
 bool isTerminating(char c);
 bool isAlpha(char c);

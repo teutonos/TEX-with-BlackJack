@@ -3,21 +3,21 @@
 
 namespace tokenizer
 {
-  std::vector<std::string> keywords;
+  std::vector<std::wstring> keywords;
   std::vector<Token> keyTokens;
 };
 
 void tokenizer::init()
 {
-  keywords.push_back("\\int");
-  keywords.push_back("\\over");
-  keywords.push_back("_");
-  keywords.push_back("^");
+  keywords.push_back(L"\\int");
+  keywords.push_back(L"\\over");
+  keywords.push_back(L"_");
+  keywords.push_back(L"^");
 
-  keyTokens.push_back(Token(UNARY, PREFIX, INTEGRAL, "integral"));
-  keyTokens.push_back(Token(BINARY, INFIX, FRACTION, "fraction"));
-  keyTokens.push_back(Token(BINARY, INFIX, SUBSCRIPT, "subscript"));
-  keyTokens.push_back(Token(BINARY, INFIX, SUPERSCRIPT, "superscript"));
+  keyTokens.push_back(Token(UNARY, PREFIX, INTEGRAL, L"integral"));
+  keyTokens.push_back(Token(BINARY, INFIX, FRACTION, L"fraction"));
+  keyTokens.push_back(Token(BINARY, INFIX, SUBSCRIPT, L"subscript"));
+  keyTokens.push_back(Token(BINARY, INFIX, SUPERSCRIPT, L"superscript"));
 }
 
 bool isTerminating(char c)
@@ -56,10 +56,10 @@ bool genSpace(char c)
   return ((c == ' ') || (c == '\n') || (c == '\r') || (c == '\t'));
 }
 
-std::vector<std::string>* parseString(std::string str)
+std::vector<std::wstring>* parseString(std::wstring str)
 {
-  std::vector<std::string>* result = new std::vector<std::string>;
-  str += " ";
+  std::vector<std::wstring>* result = new std::vector<std::wstring>;
+  str += L" ";
 
   for(int i = 0; i < str.size(); i++)
   {
@@ -67,7 +67,7 @@ std::vector<std::string>* parseString(std::string str)
     {
       case '\\':
         {
-          std::string name("\\");
+          std::wstring name(L"\\");
           i++;
           if (isTerminating(str[i])) //экранируемый символ
           {
@@ -82,7 +82,7 @@ std::vector<std::string>* parseString(std::string str)
           }
           i--;
 
-          if(name != "")
+          if(name != L"")
           {
             result->push_back(name);
           }
@@ -93,14 +93,14 @@ std::vector<std::string>* parseString(std::string str)
         CASECHAR
         CASECAPCHAR
         {
-          std::string name("");
+          std::wstring name(L"");
           while( (isAlpha(str[i])) || (isNum(str[i])) ) //переменная/число
           {
             name += str[i++];
           }
           i--;
 
-          if(name != "")
+          if(name != L"")
           {
             result->push_back(name);
           }
@@ -108,13 +108,13 @@ std::vector<std::string>* parseString(std::string str)
         break;
 
 //      CASESYM
-//          result->push_back(std::string(1, str[i]));
+//          result->push_back(std::wstring(1, str[i]));
 //          break;
 
       default:
         if (!genSpace(str[i]))
         {
-          result->push_back(std::string(1, str[i]));
+          result->push_back(std::wstring(1, str[i]));
         }
         break;
     }
@@ -122,19 +122,19 @@ std::vector<std::string>* parseString(std::string str)
 
   for(int i = 0; i < result->size(); i++)
   {
-    if (((*result)[i] == "{")   && ((*result)[i+1] == "}"))
+    if (((*result)[i] == L"{")   && ((*result)[i+1] == L"}"))
     {
       result->erase(result->begin() + i + 1);
-      (*result)[i] = "{}";
+      (*result)[i] = L"{}";
     }
   }
   return result;
 }
 
-std::vector<Token>* tokenize(std::string str)
+std::vector<Token>* tokenize(std::wstring str)
 {
   std::vector<Token>* result = new std::vector<Token>;
-  std::vector<std::string>* subStrs = parseString(str);
+  std::vector<std::wstring>* subStrs = parseString(str);
 
   for (int i = 0; i < subStrs->size(); i++)
   {
@@ -152,16 +152,16 @@ std::vector<Token>* tokenize(std::string str)
       continue;
     Token t;
 
-    if ((*subStrs)[i] == "{}")
+    if ((*subStrs)[i] == L"{}")
     {
       t.type = EMPTY;
-      t.varName = "\\empty";
+      t.varName = L"\\empty";
     }
-    else if ((*subStrs)[i] == "{")
+    else if ((*subStrs)[i] == L"{")
     {
       t.type = OPEN_BRACKET;
     }
-    else if ((*subStrs)[i] == "}")
+    else if ((*subStrs)[i] == L"}")
     {
       t.type = CLOSE_BRACKET;
     }
@@ -193,7 +193,7 @@ std::vector<Token>* tokenize(std::string str)
   return result;
 }
 
-Formula* makeTreeStack(std::string str)
+Formula* makeTreeStack(std::wstring str)
 {
   std::vector<Token>* pTokenVector = tokenize(str);
   Formula* result = new Formula(pTokenVector);
@@ -204,7 +204,7 @@ Formula* makeTreeStack(std::string str)
   return result;
 }
 
-Token::Token(TokenType t, Place p, OpKind k, std::string name)
+Token::Token(TokType t, Place p, OpKind k, std::wstring name)
 {
   type = t;
   pos = p;
@@ -217,5 +217,5 @@ Token::Token()
   type    = UNKNOWN;
   pos     = NONE;
   kind    = NOT_OPERATOR;
-  varName = "";
+  varName = L"";
 }

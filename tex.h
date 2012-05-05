@@ -6,29 +6,30 @@
 
 #include "tokenizer.h"
 
-//testiiiiiing
-
 class Node
 {
   protected:
     bool used;
-    int scriptOffset;
+    int scriptOffset,
+        fontSize,
+        width,
+        height;
     Node  *subscript,
           *supscript;
-    std::string name;
+    std::wstring name;
   public:
-//    virtual double getWidth();
-//    virtual double getHeight();
-//    virtual void draw();
+//    virtual double getWidth(double multiplier = 1.);
+//    virtual double getHeight(double multiplier = 1.);
+//    virtual void draw(HDC hdc, int x1, int y1, int x2, int y2);
     virtual ~Node();
-    Node(std::string str);
+    Node(std::wstring str);
     virtual void enTree(std::vector<Node*>* stack, int index);
     virtual void checkScript(std::vector<Node*>* stack, int index);
     void setUse();
     bool isUsed();
-    std::string getName() {return name;}
-    virtual std::string put() {}
-    std::string putScripts();
+    std::wstring getName() {return name;}
+    virtual std::wstring put() {return L"";}
+    std::wstring putScripts();
     void setSuperScript(Node*);
     void setSubScript(Node*);
 };
@@ -38,26 +39,26 @@ class Formula: public Node
   protected:
     std::vector<Node*> content;
   public:
-    Formula(std::vector<Token>*, int = 0, TokenType = ENDLINE);
-    void parse(std::vector<Token>*, int = 0, TokenType = ENDLINE);
+    Formula(std::vector<Token>*, int = 0, TokType = ENDLINE);
+    void parse(std::vector<Token>*, int = 0, TokType = ENDLINE);
     virtual void enTree(std::vector<Node*>* stack, int index);
     virtual ~Formula();
     std::vector<Node*>* getContent() {return &content;}
-    virtual std::string put();
+    virtual std::wstring put();
 };
 
 class Lexem: public Node
 {
   protected:
   public:
-    Lexem(std::string str = ""): Node(str) {}
-    virtual std::string put();
+    Lexem(std::wstring str = L""): Node(str) {}
+    virtual std::wstring put();
 };
 
 class Operation: public Node
 {
   public:
-    Operation(std::string str): Node(str) {}
+    Operation(std::wstring str): Node(str) {}
 };
 
 class Unary: public Operation
@@ -66,10 +67,10 @@ class Unary: public Operation
     Unary* actual;
     Node *operand;
   public:
-    Unary(std::string str): Operation(str) {actual = NULL;}
+    Unary(std::wstring str);
     virtual ~Unary();
     Node* getOperand() {return operand;}
-    virtual std::string put();
+    virtual std::wstring put();
 };
 
 class Binary: public Operation
@@ -79,11 +80,11 @@ class Binary: public Operation
     Node  *leftOperand,
           *rightOperand;
   public:
-    Binary(std::string str);
+    Binary(std::wstring str);
     virtual ~Binary();
     Node* getLeft() {return leftOperand;}
     Node* getRight() {return rightOperand;}
-    virtual std::string put();
+    virtual std::wstring put();
 };
 
 namespace unary
@@ -92,14 +93,14 @@ namespace unary
   {
     public:
       virtual void enTree(std::vector<Node*>* stack, int index);
-      Prefix(std::string str): Unary(str) {}
+      Prefix(std::wstring str): Unary(str) {}
   };
 
   class Postfix: public Unary
   {
     public:
       virtual void enTree(std::vector<Node*>* stack, int index);
-      Postfix(std::string str): Unary(str) {}
+      Postfix(std::wstring str): Unary(str) {}
   };
 };
 
@@ -109,14 +110,14 @@ namespace binary
   {
     public:
       virtual void enTree(std::vector<Node*>* stack, int index);
-      Prefix(std::string str): Binary(str) {}
+      Prefix(std::wstring str): Binary(str) {}
   };
 
   class Infix: public Binary
   {
     public:
       virtual void enTree(std::vector<Node*>* stack, int index);
-      Infix(std::string str): Binary(str) {}
+      Infix(std::wstring str): Binary(str) {}
       virtual void checkScript(std::vector<Node*>* stack, int index);
   };
 
@@ -124,7 +125,7 @@ namespace binary
   {
     public:
       virtual void enTree(std::vector<Node*>* stack, int index);
-      Postfix(std::string str): Binary(str) {}
+      Postfix(std::wstring str): Binary(str) {}
   };
 };
 
