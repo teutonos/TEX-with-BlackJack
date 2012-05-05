@@ -29,14 +29,15 @@ class Node
           *supscript;
     std::wstring name;
   public:
-    virtual double getWidth(double multiplier = 1.);
-    virtual double getHeight(double multiplier = 1.);
+    virtual int getWidth(double multiplier = 1.) {}
+    virtual int getHeight(double multiplier = 1.) {}
     virtual void draw(HDC hdc,
                       int x,
                       int y,
                       HAlign h = HA_CENTER,
                       VAlign v = VA_MIDDLE,
-                      HFONT* font = NULL);
+                      HFONT* font = NULL
+                     ) {}
     virtual ~Node();
     Node(std::wstring str);
     virtual void enTree(std::vector<Node*>* stack, int index);
@@ -55,6 +56,14 @@ class Formula: public Node
   protected:
     std::vector<Node*> content;
   public:
+    virtual int getWidth(double multiplier = 1.);
+    virtual int getHeight(double multiplier = 1.);
+    virtual void draw(HDC hdc,
+                      int x,
+                      int y,
+                      HAlign h = HA_CENTER,
+                      VAlign v = VA_MIDDLE,
+                      HFONT* font = NULL);
     Formula(std::vector<Token>*, int = 0, TokType = ENDLINE);
     void parse(std::vector<Token>*, int = 0, TokType = ENDLINE);
     virtual void enTree(std::vector<Node*>* stack, int index);
@@ -134,7 +143,7 @@ namespace binary
     public:
       virtual void enTree(std::vector<Node*>* stack, int index);
       Infix(std::wstring str): Binary(str) {}
-      virtual void checkScript(std::vector<Node*>* stack, int index);
+      virtual void checkScript(std::vector<Node*>* stack, unsigned int index);
   };
 
   class Postfix: public Binary

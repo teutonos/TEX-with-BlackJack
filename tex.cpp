@@ -136,17 +136,17 @@ void Node::enTree(std::vector<Node*>* stack, int index)
 
 void Formula::enTree(std::vector<Node*>* stack, int index)
 {
-  for (int i = 0; i < content.size(); i++)
+  for (unsigned int i = 0; i < content.size(); i++)
   {
     content[i]->checkScript(&content, i);
   }
 
-  for (int i = 0; i < content.size(); i++)
+  for (unsigned int i = 0; i < content.size(); i++)
   {
     content[i]->enTree(&content, i);
   }
 
-  for (int i = 0; i < content.size(); i++)
+  for (unsigned int i = 0; i < content.size(); i++)
   {
     if (content[i]->isUsed())
     {
@@ -181,7 +181,7 @@ void Node::checkScript(std::vector<Node*>* stack, int index)
 
 }
 
-void binary::Infix::checkScript(std::vector<Node*>* stack, int index)
+void binary::Infix::checkScript(std::vector<Node*>* stack, unsigned int index)
 {
   if (name == L"superscript")
   {
@@ -265,7 +265,7 @@ std::wstring Node::putScripts()
 std::wstring Formula::put()
 {
   std::wstring tmp = L"{";
-  for (int i = 0; i < content.size(); i++)
+  for (unsigned int i = 0; i < content.size(); i++)
   {
     tmp += content[i]->put() + L"; ";
   }
