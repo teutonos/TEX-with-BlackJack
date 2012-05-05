@@ -3,8 +3,19 @@
 
 #include <vector>
 #include <string>
+#include <windows.h>
 
 #include "tokenizer.h"
+
+enum HAlign
+{
+  HA_LEFT, HA_CENTER, HA_RIGHT
+};
+
+enum VAlign
+{
+  VA_TOP, VA_MIDDLE, VA_BOTTOM
+};
 
 class Node
 {
@@ -18,9 +29,14 @@ class Node
           *supscript;
     std::wstring name;
   public:
-//    virtual double getWidth(double multiplier = 1.);
-//    virtual double getHeight(double multiplier = 1.);
-//    virtual void draw(HDC hdc, int x1, int y1, int x2, int y2);
+    virtual double getWidth(double multiplier = 1.);
+    virtual double getHeight(double multiplier = 1.);
+    virtual void draw(HDC hdc,
+                      int x,
+                      int y,
+                      HAlign h = HA_CENTER,
+                      VAlign v = VA_MIDDLE,
+                      HFONT* font = NULL);
     virtual ~Node();
     Node(std::wstring str);
     virtual void enTree(std::vector<Node*>* stack, int index);

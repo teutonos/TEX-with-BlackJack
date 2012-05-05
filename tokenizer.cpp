@@ -14,7 +14,7 @@ void tokenizer::init()
   keywords.push_back(L"_");
   keywords.push_back(L"^");
 
-  keyTokens.push_back(Token(UNARY, PREFIX, INTEGRAL, L"integral"));
+  keyTokens.push_back(Token(UNARY, PREFIX, INTEGRAL, L"в€«"));
   keyTokens.push_back(Token(BINARY, INFIX, FRACTION, L"fraction"));
   keyTokens.push_back(Token(BINARY, INFIX, SUBSCRIPT, L"subscript"));
   keyTokens.push_back(Token(BINARY, INFIX, SUPERSCRIPT, L"superscript"));
@@ -69,13 +69,13 @@ std::vector<std::wstring>* parseString(std::wstring str)
         {
           std::wstring name(L"\\");
           i++;
-          if (isTerminating(str[i])) //экранируемый символ
+          if (isTerminating(str[i])) //СЌРєСЂР°РЅРёСЂСѓРµРјС‹Р№ СЃРёРјРІРѕР»
           {
             name += str[i++];
           }
           else
           {
-            while(isAlpha(str[i])) //служебное слово
+            while(isAlpha(str[i])) //СЃР»СѓР¶РµР±РЅРѕРµ СЃР»РѕРІРѕ
             {
               name += str[i++];
             }
@@ -94,7 +94,7 @@ std::vector<std::wstring>* parseString(std::wstring str)
         CASECAPCHAR
         {
           std::wstring name(L"");
-          while( (isAlpha(str[i])) || (isNum(str[i])) ) //переменная/число
+          while( (isAlpha(str[i])) || (isNum(str[i])) ) //РїРµСЂРµРјРµРЅРЅР°СЏ/С‡РёСЃР»Рѕ
           {
             name += str[i++];
           }

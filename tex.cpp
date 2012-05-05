@@ -276,9 +276,9 @@ std::wstring Formula::put()
 
 std::wstring Lexem::put()
 {
-  return  //"'" +
+  return  L"'" +
           name +
-          //"'" +
+          L"'" +
           putScripts();
 }
 
