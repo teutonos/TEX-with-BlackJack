@@ -6,7 +6,6 @@ LRESULT CALLBACK MainWndProc(HWND, UINT, WPARAM, LPARAM);
 ATOM RegMyWindowClass(HINSTANCE, LPCTSTR);
 //глобализация окон
 HWND hMainWnd, hInputWnd, hOutputWnd, hButtonWnd;
-std::wstring inputString(L"x");
 Formula* f;
 // функция WinMain
 int APIENTRY WinMain(HINSTANCE hInstance,
@@ -31,11 +30,11 @@ int APIENTRY WinMain(HINSTANCE hInstance,
                 WS_SYSMENU  | WS_VISIBLE    ,
                 x, y, 600, 400,
                 NULL, NULL, hInstance, NULL);
-  
+
   hInputWnd = //поле ввода
   CreateWindow ("EDIT", NULL,
-                WS_VISIBLE | WS_CHILD | WS_BORDER | WS_VSCROLL | WS_HSCROLL | ES_MULTILINE | ES_WANTRETURN,	
-                10, 200, 570, 120,	
+                WS_VISIBLE | WS_CHILD | WS_BORDER | WS_VSCROLL | WS_HSCROLL | ES_MULTILINE | ES_WANTRETURN,
+                10, 200, 570, 120,
                 hMainWnd, NULL,	hInstance, NULL );
 
   hButtonWnd = //кнопка
@@ -46,7 +45,6 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 
   SetFocus (hInputWnd); //установка фокуса курсора на окне Ввода
   tokenizer::init();
-  f = makeTreeStack(inputString);
   // цикл сообщений приложения
   MSG msg = {0};    // структура сообщения
   int cond = 0;   // переменная состояния
@@ -55,19 +53,19 @@ int APIENTRY WinMain(HINSTANCE hInstance,
   {
     i++;
     if (cond == -1) return 3;  // если GetMessage вернул ошибку - выход
-    TranslateMessage(&msg);    
+    TranslateMessage(&msg);
     DispatchMessage(&msg);
     if (i == 20) {
     i=0;
-    RECT rect;    
+    RECT rect;
     HDC hdc = GetDC(hMainWnd); // занимает окно для приложения
-    GetClientRect(hMainWnd, &rect); 
+    GetClientRect(hMainWnd, &rect);
     Rectangle (hdc, 10, 10, 580, 190);
-    f->draw(hdc, 300, 120);
+    if (f) f->draw(hdc, 300, 120);
     //TextOut ( hdc, 300 - length*3.4, 260, inputString, length );
     UpdateWindow (hMainWnd);
     ReleaseDC(hMainWnd, hdc); // освобождает окно для других приложений
-    }    
+    }
   }
 
   return msg.wParam;  // возвращаем код завершения программы
@@ -96,12 +94,16 @@ LRESULT CALLBACK MainWndProc(
     switch (wParam)
     {
     case BN_CLICKED:
+      std::wstring inputString(L"{}");
       char str[100];
       wchar_t wstr[100];
       GetWindowText(hInputWnd, str, 100);
       mbstowcs(wstr, str, 100);
-      inputString = wstr;
+      if (wstr[1] != L'\0') {
+        inputString = wstr;
+      } 
       f = makeTreeStack(inputString);
+      break;
     }
     break;
 
@@ -109,7 +111,7 @@ LRESULT CALLBACK MainWndProc(
     PostQuitMessage(0);  // реакция на сообщение
     break;
 
-  default:  
+  default:
     // все сообщения не обработанные Вами обработает сама Windows
     return DefWindowProc(hWnd, message, wParam, lParam);
   }
