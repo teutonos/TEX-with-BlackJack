@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include "tex.h"
 #include "operators.h"
 
@@ -99,7 +97,14 @@ Unary::Unary(std::wstring str): Operation(str)
 
 Binary::Binary(std::wstring str): Operation(str)
 {
-  actual = NULL;
+  if (str == L"fraction")
+  {
+    actual = new Over(L"");
+  }
+  else
+  {
+    actual = NULL;
+  }
   leftOperand = rightOperand = NULL;
 }
 
@@ -173,6 +178,7 @@ void unary::Prefix::enTree(std::vector<Node*>* stack, int index)
     actual->setOperand(operand);
     actual->setSubScript(subscript);
     actual->setSuperScript(supscript);
+    subscript = supscript = NULL;
   }
   operand->setUse();
 }
@@ -185,6 +191,7 @@ void unary::Postfix::enTree(std::vector<Node*>* stack, int index)
     actual->setOperand(operand);
     actual->setSubScript(subscript);
     actual->setSuperScript(supscript);
+    subscript = supscript = NULL;
   }
   operand->setUse();
 }
@@ -199,12 +206,13 @@ void binary::Prefix::enTree(std::vector<Node*>* stack, int index)
     actual->setRight(rightOperand);
     actual->setSubScript(subscript);
     actual->setSuperScript(supscript);
+    subscript = supscript = NULL;
   }
   leftOperand->setUse();
   rightOperand->setUse();
 }
 
-void Node::checkScript(std::vector<Node*>* stack, int index)
+void Node::checkScript(std::vector<Node*>* stack, unsigned int index)
 {
 
 }
@@ -247,6 +255,7 @@ void binary::Infix::enTree(std::vector<Node*>* stack, int index)
     actual->setRight(rightOperand);
     actual->setSubScript(subscript);
     actual->setSuperScript(supscript);
+    subscript = supscript = NULL;
   }
   leftOperand->setUse();
   rightOperand->setUse();
@@ -262,6 +271,7 @@ void binary::Postfix::enTree(std::vector<Node*>* stack, int index)
     actual->setRight(rightOperand);
     actual->setSubScript(subscript);
     actual->setSuperScript(supscript);
+    subscript = supscript = NULL;
   }
   leftOperand->setUse();
   rightOperand->setUse();
@@ -270,13 +280,26 @@ void binary::Postfix::enTree(std::vector<Node*>* stack, int index)
 Unary::~Unary()
 {
   if (actual != NULL)
+  {
     delete actual;
+  }
+  else
+  {
+    delete operand;
+  }
 }
 
 Binary::~Binary()
 {
   if (actual != NULL)
+  {
     delete actual;
+  }
+  else
+  {
+    delete leftOperand;
+    delete rightOperand;
+  }
 }
 
 std::wstring Node::putScripts()

@@ -1,6 +1,8 @@
 #include "tokenizer.h"
 #include "tex.h"
 
+#include <iostream>
+
 namespace tokenizer
 {
   std::vector<std::wstring> keywords;
@@ -14,7 +16,7 @@ void tokenizer::init()
   keywords.push_back(L"_");
   keywords.push_back(L"^");
 
-  keyTokens.push_back(Token(UNARY, PREFIX, INTEGRAL, L"∫"));
+  keyTokens.push_back(Token(UNARY, PREFIX, INTEGRAL, L"integral"));
   keyTokens.push_back(Token(BINARY, INFIX, FRACTION, L"fraction"));
   keyTokens.push_back(Token(BINARY, INFIX, SUBSCRIPT, L"subscript"));
   keyTokens.push_back(Token(BINARY, INFIX, SUPERSCRIPT, L"superscript"));
@@ -61,7 +63,7 @@ std::vector<std::wstring>* parseString(std::wstring str)
   std::vector<std::wstring>* result = new std::vector<std::wstring>;
   str += L" ";
 
-  for(int i = 0; i < str.size(); i++)
+  for(unsigned int i = 0; i < str.size(); i++)
   {
     switch(str[i])
     {
@@ -120,7 +122,7 @@ std::vector<std::wstring>* parseString(std::wstring str)
     }
   }
 
-  for(int i = 0; i < result->size(); i++)
+  for(unsigned int i = 0; i < result->size(); i++)
   {
     if (((*result)[i] == L"{")   && ((*result)[i+1] == L"}"))
     {
@@ -136,7 +138,7 @@ std::vector<Token>* tokenize(std::wstring str)
   std::vector<Token>* result = new std::vector<Token>;
   std::vector<std::wstring>* subStrs = parseString(str);
 
-  for (int i = 0; i < subStrs->size(); i++)
+  for (unsigned int i = 0; i < subStrs->size(); i++)
   {
     bool key = false;
     for (int j = 0; j < LAST; j++)
@@ -155,7 +157,7 @@ std::vector<Token>* tokenize(std::wstring str)
     if ((*subStrs)[i] == L"{}")
     {
       t.type = EMPTY;
-      t.varName = L"\\empty";
+      t.varName = L" ";
     }
     else if ((*subStrs)[i] == L"{")
     {
@@ -179,7 +181,7 @@ std::vector<Token>* tokenize(std::wstring str)
   t.type = ENDLINE;
   result->push_back(t);
 
-  for (int i = 0; i < result->size() - 2; i++)
+  for (unsigned int i = 0; i < result->size() - 2; i++)
   {
   	if (((*result)[i].type == OPEN_BRACKET) &&
         ((*result)[i+2].type == CLOSE_BRACKET))
