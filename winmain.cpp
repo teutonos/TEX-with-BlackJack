@@ -46,16 +46,19 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 
   SetFocus (hInputWnd); //установка фокуса курсора на окне Ввода
   tokenizer::init();
-   f = makeTreeStack(inputString);
+  f = makeTreeStack(inputString);
   // цикл сообщений приложения
   MSG msg = {0};    // структура сообщения
   int cond = 0;   // переменная состояния
+  int i = 0;
   while ((cond = GetMessage(&msg, NULL, 0, 0 )) != 0) // цикл сообщений
   {
+    i++;
     if (cond == -1) return 3;  // если GetMessage вернул ошибку - выход
     TranslateMessage(&msg);    
     DispatchMessage(&msg);
-   
+    if (i == 20) {
+    i=0;
     RECT rect;    
     HDC hdc = GetDC(hMainWnd); // занимает окно для приложения
     GetClientRect(hMainWnd, &rect); 
@@ -64,7 +67,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
     //TextOut ( hdc, 300 - length*3.4, 260, inputString, length );
     UpdateWindow (hMainWnd);
     ReleaseDC(hMainWnd, hdc); // освобождает окно для других приложений
-    
+    }    
   }
 
   return msg.wParam;  // возвращаем код завершения программы
@@ -93,7 +96,11 @@ LRESULT CALLBACK MainWndProc(
     switch (wParam)
     {
     case BN_CLICKED:
-      inputString = L"\\int_a^b {{{y} + x} \\over {{} \\over a}}";
+      char str[100];
+      wchar_t wstr[100];
+      GetWindowText(hInputWnd, str, 100);
+      mbstowcs(wstr, str, 100);
+      inputString = wstr;
       f = makeTreeStack(inputString);
     }
     break;
