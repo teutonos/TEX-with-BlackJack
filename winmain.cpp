@@ -1,12 +1,13 @@
 #include <windows.h>
-#include <cstring>
+#include <string>
+#include "tex.h"
 // объ€вление функций
 LRESULT CALLBACK MainWndProc(HWND, UINT, WPARAM, LPARAM);
 ATOM RegMyWindowClass(HINSTANCE, LPCTSTR);
 //глобализаци€ окон
 HWND hMainWnd, hInputWnd, hOutputWnd, hButtonWnd;
-char inputString[80];
-
+std::wstring inputString(L"x");
+Formula* f;
 // функци€ WinMain
 int APIENTRY WinMain(HINSTANCE hInstance,
                      HINSTANCE hPrevInstance,
@@ -34,25 +35,18 @@ int APIENTRY WinMain(HINSTANCE hInstance,
   hInputWnd = //поле ввода
   CreateWindow ("EDIT", NULL,
                 WS_VISIBLE | WS_CHILD | WS_BORDER | WS_VSCROLL | WS_HSCROLL | ES_MULTILINE | ES_WANTRETURN,	
-                10, 10, 570, 120,	
+                10, 200, 570, 120,	
                 hMainWnd, NULL,	hInstance, NULL );
- /*
-    hOutputWnd = //поле вывода
-    CreateWindow ("EDIT",	NULL, 
-                  WS_VISIBLE | WS_CHILD | ES_READONLY ,
-                  10,	180, 570,	180,
-                  hMainWnd, NULL, hInstance, NULL );
-*/
-
 
   hButtonWnd = //кнопка
   CreateWindow ("BUTTON",	"OK",
                 WS_VISIBLE | WS_CHILD | WS_BORDER ,
-                480, 140, 100, 30,
+                480, 330, 100, 30,
                 hMainWnd, NULL, hInstance, NULL );
 
   SetFocus (hInputWnd); //установка фокуса курсора на окне ¬вода
-
+  tokenizer::init();
+   f = makeTreeStack(inputString);
   // цикл сообщений приложени€
   MSG msg = {0};    // структура сообщени€
   int cond = 0;   // переменна€ состо€ни€
@@ -61,13 +55,13 @@ int APIENTRY WinMain(HINSTANCE hInstance,
     if (cond == -1) return 3;  // если GetMessage вернул ошибку - выход
     TranslateMessage(&msg);    
     DispatchMessage(&msg);
-
+   
     RECT rect;    
     HDC hdc = GetDC(hMainWnd); // занимает окно дл€ приложени€
     GetClientRect(hMainWnd, &rect); 
-    int length = strlen(inputString);
-    Rectangle (hdc, 10, 180, 580, 360);
-    TextOut ( hdc, 300 - length*3.4, 260, inputString, length );
+    Rectangle (hdc, 10, 10, 580, 190);
+    f->draw(hdc, 300, 120);
+    //TextOut ( hdc, 300 - length*3.4, 260, inputString, length );
     UpdateWindow (hMainWnd);
     ReleaseDC(hMainWnd, hdc); // освобождает окно дл€ других приложений
     
@@ -99,7 +93,8 @@ LRESULT CALLBACK MainWndProc(
     switch (wParam)
     {
     case BN_CLICKED:
-      GetWindowText(hInputWnd, inputString, 80);
+      inputString = L"\\int_a^b {{{y} + x} \\over {{} \\over a}}";
+      f = makeTreeStack(inputString);
     }
     break;
 
