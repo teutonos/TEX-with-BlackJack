@@ -58,7 +58,7 @@ void Formula::draw(HDC hdc,
 
   for (unsigned int i = 0; i < content.size(); i++)
   {
-  	content[i]->draw(hdc, x, y, h, v, multiplier);
+  	content[i]->draw(hdc, x, y, HA_LEFT, VA_TOP, multiplier);
   	x += content[i]->getWidth(multiplier);
   }
 
@@ -124,13 +124,13 @@ void Lexem::draw(HDC hdc,
 
   if (supscript != NULL)
   {
-    supscript->draw(hdc, x, y, HA_CENTER, VA_BOTTOM, multiplier * 0.5);
+    supscript->draw(hdc, x, y, HA_LEFT, VA_MIDDLE, multiplier * 0.7);
   }
 
   if (subscript != NULL)
   {
     y += getHeight(multiplier);
-    subscript->draw(hdc, x, y, HA_CENTER, VA_TOP, multiplier * 0.5);
+    subscript->draw(hdc, x, y, HA_LEFT, VA_TOP, multiplier * 0.7);
     y -= getHeight(multiplier);
   }
 }

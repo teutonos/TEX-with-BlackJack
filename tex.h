@@ -9,8 +9,8 @@
 #include "tokenizer.h"
 
 #define max(a,b) ((a)>(b))?(a):(b)
-#define FONT_SIZE 20
-#define FONT_WIDTH FONT_SIZE
+#define FONT_SIZE 15
+#define FONT_WIDTH (FONT_SIZE*9/10)
 #define FONT_HEIGHT FONT_SIZE
 
 enum HAlign
@@ -73,6 +73,7 @@ class Formula: public Node
     Formula(std::vector<Token>*, int = 0, TokType = ENDLINE);
     void parse(std::vector<Token>*, int = 0, TokType = ENDLINE);
     virtual void enTree(std::vector<Node*>* stack, int index);
+    virtual void checkScript(std::vector<Node*>* stack, unsigned int index);
     virtual ~Formula();
     std::vector<Node*>* getContent() {return &content;}
     virtual std::wstring put();

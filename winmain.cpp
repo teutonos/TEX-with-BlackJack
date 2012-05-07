@@ -56,15 +56,16 @@ int APIENTRY WinMain(HINSTANCE hInstance,
     TranslateMessage(&msg);
     DispatchMessage(&msg);
     if (i == 20) {
-    i=0;
-    RECT rect;
-    HDC hdc = GetDC(hMainWnd); // занимает окно для приложения
-    GetClientRect(hMainWnd, &rect);
-    Rectangle (hdc, 10, 10, 580, 190);
-    if (f) f->draw(hdc, 300, 120);
-    //TextOut ( hdc, 300 - length*3.4, 260, inputString, length );
-    UpdateWindow (hMainWnd);
-    ReleaseDC(hMainWnd, hdc); // освобождает окно для других приложений
+      i=0;
+      RECT rect;
+      HDC hdc = GetDC(hMainWnd); // занимает окно для приложения
+      GetClientRect(hMainWnd, &rect);
+      Rectangle (hdc, 10, 10, 580, 190);
+      if (f)
+        f->draw(hdc, 300, 120);
+//        TextOutW ( hdc, 300, 120, f->put().data(), f->put().length());
+      UpdateWindow (hMainWnd);
+      ReleaseDC(hMainWnd, hdc); // освобождает окно для других приложений
     }
   }
 
@@ -99,9 +100,10 @@ LRESULT CALLBACK MainWndProc(
       wchar_t wstr[100];
       GetWindowText(hInputWnd, str, 100);
       mbstowcs(wstr, str, 100);
-      if (wstr[1] != L'\0') {
+      if (wstr[0] != L'\0') {
         inputString = wstr;
-      } 
+      }
+      if (f) delete f;
       f = makeTreeStack(inputString);
       break;
     }

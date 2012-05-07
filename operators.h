@@ -4,6 +4,7 @@
 #include "tex.h"
 
 #define INTEGRAL_KOEF (5/3)
+#define FRACTION_KOEF 0.7
 
 class Integral: public unary::Prefix
 {
@@ -34,6 +35,7 @@ class Over: public binary::Infix
                       double multiplier = 1.
                       );
     Over(std::wstring str) : binary::Infix(str) {}
+    ~Over();
 };
 
 

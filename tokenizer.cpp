@@ -200,6 +200,7 @@ Formula* makeTreeStack(std::wstring str)
   std::vector<Token>* pTokenVector = tokenize(str);
   Formula* result = new Formula(pTokenVector);
 
+  result->checkScript(NULL, 0);
   result->enTree(result->getContent(), 0);
 
   delete pTokenVector;

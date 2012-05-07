@@ -8,7 +8,7 @@ int Integral::getWidth(double multiplier)
 
 int Integral::getHeight(double multiplier)
 {
-  return (height = operand->getHeight() + FONT_HEIGHT) * multiplier;
+  return height = operand->getHeight(multiplier);
 }
 
 void Integral::draw(HDC hdc, int x, int y, HAlign h, VAlign v, double multiplier)
@@ -47,7 +47,6 @@ void Integral::draw(HDC hdc, int x, int y, HAlign h, VAlign v, double multiplier
            name.length()
           );
 
-  y += FONT_SIZE * multiplier * 0.4;
   x += FONT_SIZE * multiplier;
   if (supscript != NULL)
   {
@@ -65,8 +64,8 @@ void Integral::draw(HDC hdc, int x, int y, HAlign h, VAlign v, double multiplier
     x += FONT_SIZE * multiplier / 4;
   }
 
-  y += (getHeight(multiplier) - operand->getHeight(multiplier)) / 2;
-  operand->draw(hdc, x, y, HA_LEFT, VA_TOP, multiplier);
+  y += getHeight(multiplier) * INTEGRAL_KOEF + FONT_SIZE / 2;
+  operand->draw(hdc, x, y, HA_LEFT, VA_MIDDLE, multiplier);
 }
 
 Integral::~Integral()
@@ -76,12 +75,19 @@ Integral::~Integral()
 
 int Over::getWidth(double multiplier)
 {
-  return (width = max(leftOperand->getWidth(), rightOperand->getWidth())) * multiplier;
+  return
+    (width = max(leftOperand->getWidth(FRACTION_KOEF),
+                 rightOperand->getWidth(FRACTION_KOEF))
+    ) * multiplier;
 }
 
 int Over::getHeight(double multiplier)
 {
-  return (height = (leftOperand->getHeight() + rightOperand->getHeight()) * 0.7 + FONT_SIZE / 2) * multiplier;
+  return
+    (height = (leftOperand->getHeight(FRACTION_KOEF) +
+               rightOperand->getHeight(FRACTION_KOEF)) +
+               FONT_SIZE / 2
+    ) * multiplier;
 }
 
 void Over::draw(HDC hdc, int x, int y, HAlign h, VAlign v, double multiplier)
@@ -128,3 +134,5 @@ void Over::draw(HDC hdc, int x, int y, HAlign h, VAlign v, double multiplier)
   }
 
 }
+
+Over::~Over()

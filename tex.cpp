@@ -152,11 +152,6 @@ void Formula::enTree(std::vector<Node*>* stack, int index)
 {
   for (unsigned int i = 0; i < content.size(); i++)
   {
-    content[i]->checkScript(&content, i);
-  }
-
-  for (unsigned int i = 0; i < content.size(); i++)
-  {
     content[i]->enTree(&content, i);
   }
 
@@ -167,6 +162,14 @@ void Formula::enTree(std::vector<Node*>* stack, int index)
       content.erase(content.begin() + i);
       i--;
     }
+  }
+}
+
+void Formula::checkScript(std::vector<Node*>* stack, unsigned int index)
+{
+  for (unsigned int i = 0; i < content.size(); i++)
+  {
+    content[i]->checkScript(&content, i);
   }
 }
 
@@ -222,6 +225,7 @@ void binary::Infix::checkScript(std::vector<Node*>* stack, unsigned int index)
   if (name == L"superscript")
   {
     (*stack)[index - 1]->setSuperScript((*stack)[index + 1]);
+    (*stack)[index + 1]->checkScript(stack, index+1);
     delete (*stack)[index];
     stack->erase(stack->begin() + index + 1);
     stack->erase(stack->begin() + index);
@@ -234,6 +238,7 @@ void binary::Infix::checkScript(std::vector<Node*>* stack, unsigned int index)
   if (name == L"subscript")
   {
     (*stack)[index - 1]->setSubScript((*stack)[index + 1]);
+    (*stack)[index + 1]->checkScript(stack, index+1);
     delete (*stack)[index];
     stack->erase(stack->begin() + index + 1);
     stack->erase(stack->begin() + index);
