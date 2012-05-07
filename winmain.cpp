@@ -41,8 +41,8 @@ int APIENTRY WinMain(HINSTANCE hInstance,
                 b, (y-4*b-30)*2/3+2*b, x-2*b, (y-4*b-30)/3,
                 hMainWnd, NULL,	hInstance, NULL );
 
-  HFONT	 hFont = CreateFontA(12,
-                     0,
+  HFONT	 hFont = CreateFont (17,
+                     9,
                      0,
                      0,
                      FW_DONTCARE,
@@ -56,7 +56,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
                      VARIABLE_PITCH,
                      TEXT("Courier New")
                     );
-  //                  Send(hInputWnd,WM_SETFONT,hFont,0);
+                    SendMessage(hInputWnd,WM_SETFONT, (WPARAM)hFont,0);
 
   hButtonWnd = //кнопка
   CreateWindow ("BUTTON",	"OK",
