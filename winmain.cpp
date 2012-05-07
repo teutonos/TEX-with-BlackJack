@@ -6,7 +6,10 @@ LRESULT CALLBACK MainWndProc(HWND, UINT, WPARAM, LPARAM);
 ATOM RegMyWindowClass(HINSTANCE, LPCTSTR);
 //глобализация окон
 HWND hMainWnd, hInputWnd, hOutputWnd, hButtonWnd;
-Formula* f;
+Formula* expression;
+   int x = 600;
+   int y = 300;
+   int b = 5;
 // функция WinMain
 int APIENTRY WinMain(HINSTANCE hInstance,
                      HINSTANCE hPrevInstance,
@@ -15,32 +18,50 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 {
 
   // имя будущего класса
-  LPCTSTR WinClass = "My Window Class!";
+  LPCTSTR WinClass = "Main Window!";
   RegMyWindowClass(hInstance, WinClass);  // регистрация класса
+
 
   // вычисление координат центра экрана
   RECT screen_rect;
   GetWindowRect(GetDesktopWindow(), &screen_rect); // разрешение экрана
-  int x = screen_rect.right / 2 - 300;
-  int y = screen_rect.bottom / 2 - 200;
+  int ox = (screen_rect.right - x) / 2;
+  int oy = (screen_rect.bottom - y) / 2;
 
   // создание диалогового окна
   hMainWnd = //главное окно
-  CreateWindow (WinClass, "Dialog Window",
-                WS_SYSMENU  | WS_VISIBLE    ,
-                x, y, 600, 400,
+  CreateWindow (WinClass, "TEX Editor v.1.61803399",
+                WS_SYSMENU  | WS_VISIBLE | WS_SIZEBOX  ,
+                ox, oy, x+6, y+40,
                 NULL, NULL, hInstance, NULL);
 
   hInputWnd = //поле ввода
   CreateWindow ("EDIT", NULL,
                 WS_VISIBLE | WS_CHILD | WS_BORDER | WS_VSCROLL | WS_HSCROLL | ES_MULTILINE | ES_WANTRETURN,
-                10, 200, 570, 120,
+                b, (y-4*b-30)*2/3+2*b, x-2*b, (y-4*b-30)/3,
                 hMainWnd, NULL,	hInstance, NULL );
+
+  HFONT	 hFont = CreateFontA(12,
+                     0,
+                     0,
+                     0,
+                     FW_DONTCARE,
+                     0,
+                     0,
+                     0,
+                     ANSI_CHARSET,
+                     OUT_OUTLINE_PRECIS,
+                     CLIP_DEFAULT_PRECIS,
+                     PROOF_QUALITY,
+                     VARIABLE_PITCH,
+                     TEXT("Courier New")
+                    );
+  //                  Send(hInputWnd,WM_SETFONT,hFont,0);
 
   hButtonWnd = //кнопка
   CreateWindow ("BUTTON",	"OK",
                 WS_VISIBLE | WS_CHILD | WS_BORDER ,
-                480, 330, 100, 30,
+                x-b-100, y-b-30, 100, 30,
                 hMainWnd, NULL, hInstance, NULL );
 
   SetFocus (hInputWnd); //установка фокуса курсора на окне Ввода
@@ -52,18 +73,15 @@ int APIENTRY WinMain(HINSTANCE hInstance,
   while ((cond = GetMessage(&msg, NULL, 0, 0 )) != 0) // цикл сообщений
   {
     i++;
-    if (cond == -1) return 3;  // если GetMessage вернул ошибку - выход
+    if (cond == -1) { return 1; }  // если GetMessage вернул ошибку - выход
     TranslateMessage(&msg);
     DispatchMessage(&msg);
-    if (i == 20) {
-      i=0;
-      RECT rect;
+    if (i == 15)
+    {
+      i = 0;
       HDC hdc = GetDC(hMainWnd); // занимает окно для приложения
-      GetClientRect(hMainWnd, &rect);
-      Rectangle (hdc, 10, 10, 580, 190);
-      if (f)
-        f->draw(hdc, 300, 120);
-//        TextOutW ( hdc, 300, 120, f->put().data(), f->put().length());
+      Rectangle (hdc, b, b, x-b, (y-4*b-30)*2/3+b);
+      if (expression) expression->draw(hdc, x/2, (y-4*b-30)/3);
       UpdateWindow (hMainWnd);
       ReleaseDC(hMainWnd, hdc); // освобождает окно для других приложений
     }
@@ -87,7 +105,7 @@ ATOM RegMyWindowClass(HINSTANCE hInst, LPCTSTR ClassName)
 
 // функция обработки сообщений для главного окна
 LRESULT CALLBACK MainWndProc(
-  HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+  HWND hMainWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
   switch (message)
   {
@@ -100,13 +118,19 @@ LRESULT CALLBACK MainWndProc(
       wchar_t wstr[100];
       GetWindowText(hInputWnd, str, 100);
       mbstowcs(wstr, str, 100);
-      if (wstr[0] != L'\0') {
-        inputString = wstr;
-      }
-      if (f) delete f;
-      f = makeTreeStack(inputString);
+      if (wstr[0] != L'\0') { inputString = wstr; }
+      if (expression) { delete expression; }
+      expression = makeTreeStack(inputString);
       break;
     }
+    break;
+
+  case WM_SIZE:
+    x = LOWORD(lParam);
+    y = HIWORD(lParam);
+    SetWindowPos(hInputWnd, NULL, b, (y-4*b-30)*2/3+2*b, x-2*b, (y-4*b-30)/3, NULL);
+    SetWindowPos(hButtonWnd, NULL, x-b-100, y-b-30, 100, 30, NULL);
+    UpdateWindow (hMainWnd);
     break;
 
   case WM_DESTROY:
@@ -115,7 +139,13 @@ LRESULT CALLBACK MainWndProc(
 
   default:
     // все сообщения не обработанные Вами обработает сама Windows
-    return DefWindowProc(hWnd, message, wParam, lParam);
+    return DefWindowProc(hMainWnd, message, wParam, lParam);
   }
+  HDC hdc = GetDC(hMainWnd); // занимает окно для приложения
+  Rectangle (hdc, b, b, x-b, (y-4*b-30)*2/3+b);
+  if (expression) expression->draw(hdc, x/2, (y-4*b-30)/3);
+  UpdateWindow (hMainWnd);
+  ReleaseDC(hMainWnd, hdc); // освобождает окно для других приложений
+  UpdateWindow (hMainWnd);
   return 0;
 }
