@@ -4,7 +4,7 @@
 void Formula::parse(std::vector<Token>* input,
                     int index,
                     TokType last
-                    )
+                   )
 {
   int current = 0;
   for (int i = index; (*input)[i].type != last; i++)
@@ -119,7 +119,7 @@ Node::~Node()
 Formula::Formula(std::vector<Token>* input,
                  int index,
                  TokType last
-                 ): Node()
+                ): Node()
 {
   parse(input, index, last);
 }
@@ -225,7 +225,8 @@ void binary::Infix::checkScript(std::vector<Node*>* stack, unsigned int index)
   if (name == L"superscript")
   {
     (*stack)[index - 1]->setSuperScript((*stack)[index + 1]);
-    (*stack)[index + 1]->checkScript(stack, index+1);
+    (*stack)[index + 1]->checkScript(stack, index + 1);
+    (*stack)[index + 1]->enTree(stack, index + 1);
     delete (*stack)[index];
     stack->erase(stack->begin() + index + 1);
     stack->erase(stack->begin() + index);
@@ -238,7 +239,8 @@ void binary::Infix::checkScript(std::vector<Node*>* stack, unsigned int index)
   if (name == L"subscript")
   {
     (*stack)[index - 1]->setSubScript((*stack)[index + 1]);
-    (*stack)[index + 1]->checkScript(stack, index+1);
+    (*stack)[index + 1]->checkScript(stack, index + 1);
+    (*stack)[index + 1]->enTree(stack, index + 1);
     delete (*stack)[index];
     stack->erase(stack->begin() + index + 1);
     stack->erase(stack->begin() + index);
@@ -334,7 +336,7 @@ std::wstring Formula::put()
   {
     tmp += content[i]->put() + L"; ";
   }
-  tmp = tmp.substr(0, tmp.length()-2);
+  tmp = tmp.substr(0, tmp.length() - 2);
   tmp += L"}" + putScripts();
   return tmp;
 }

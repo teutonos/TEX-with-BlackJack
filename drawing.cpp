@@ -7,7 +7,7 @@ int Formula::getWidth(double multiplier)
   {
     for (unsigned int i = 0; i < content.size(); i++)
     {
-      width += content[i]->getWidth(multiplier);
+      width += content[i]->getWidth();
     }
   }
   return width * multiplier;
@@ -19,7 +19,7 @@ int Formula::getHeight(double multiplier)
   {
     for (unsigned int i = 0; i < content.size(); i++)
     {
-      height = max(height, content[i]->getHeight(multiplier));
+      height = max(height, content[i]->getHeight());
     }
   }
   return height * multiplier;
