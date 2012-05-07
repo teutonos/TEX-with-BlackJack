@@ -47,30 +47,30 @@ void Integral::draw(HDC hdc, int x, int y, HAlign h, VAlign v, double multiplier
            name.length()
           );
 
-  x += FONT_SIZE * multiplier;
+  x += FONT_WIDTH * multiplier;
+  y += FONT_HEIGHT * multiplier * INTEGRAL_KOEF / 2;
+
   if (supscript != NULL)
   {
-    y -= FONT_SIZE * multiplier * 0.2;
-    supscript->draw(hdc, x, y, HA_CENTER, VA_BOTTOM, multiplier * 0.5);
-    y += FONT_SIZE * multiplier * 0.2;
+    y -= FONT_HEIGHT * multiplier * 0.4;
+    supscript->draw(hdc, x, y, HA_RIGHT, VA_BOTTOM, multiplier * 0.5);
+    y += FONT_HEIGHT * multiplier * 0.4;
   }
 
   if (subscript != NULL)
   {
-    y += getHeight(multiplier);
-    x -= FONT_SIZE * multiplier / 4;
-    subscript->draw(hdc, x, y, HA_CENTER, VA_TOP, multiplier * 0.5);
-    y -= getHeight(multiplier);
-    x += FONT_SIZE * multiplier / 4;
+    y += getHeight(multiplier) * 2;
+    subscript->draw(hdc, x, y, HA_RIGHT, VA_TOP, multiplier * 0.5);
+    y -= getHeight(multiplier) * 2;
   }
 
-  y += getHeight(multiplier) * INTEGRAL_KOEF + FONT_SIZE / 2;
+  y += (getHeight(multiplier) * INTEGRAL_KOEF) / 2;
   operand->draw(hdc, x, y, HA_LEFT, VA_MIDDLE, multiplier);
 }
 
 Integral::~Integral()
 {
-  delete operand;
+  //delete operand;
 }
 
 int Over::getWidth(double multiplier)
@@ -86,7 +86,7 @@ int Over::getHeight(double multiplier)
   return
     (height = (leftOperand->getHeight(FRACTION_KOEF) +
                rightOperand->getHeight(FRACTION_KOEF)) +
-               FONT_SIZE / 2
+              FONT_SIZE / 2
     ) * multiplier;
 }
 
@@ -117,22 +117,26 @@ void Over::draw(HDC hdc, int x, int y, HAlign h, VAlign v, double multiplier)
 
   y += getHeight(multiplier) / 2;
 
-  Rectangle(hdc, x, y, x + getWidth(multiplier), y+1);
+  Rectangle(hdc, x, y, x + getWidth(multiplier), y + 1);
 
   x += getWidth(multiplier) / 2;
 
   {
-    y -= FONT_SIZE / 4;
+    y -= FONT_SIZE * multiplier / 4;
     leftOperand->draw(hdc, x, y, HA_CENTER, VA_BOTTOM, 0.7);
-    y += FONT_SIZE / 4;
+    y += FONT_SIZE * multiplier / 4;
   }
 
   {
-    y += FONT_SIZE / 4;
+    y += FONT_SIZE * multiplier / 4;
     rightOperand->draw(hdc, x, y, HA_CENTER, VA_TOP, 0.7);
-    y -= FONT_SIZE / 4;
+    y -= FONT_SIZE * multiplier / 4;
   }
 
 }
 
 Over::~Over()
+{
+//  delete leftOperand;
+//  delete rightOperand;
+}
