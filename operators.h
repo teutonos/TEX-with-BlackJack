@@ -3,7 +3,7 @@
 
 #include "tex.h"
 
-#define INTEGRAL_KOEF (5/3)
+#define INTEGRAL_KOEF (5./3)
 #define FRACTION_KOEF 0.7
 
 class Integral: public unary::Prefix
