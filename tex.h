@@ -9,9 +9,10 @@
 #include "tokenizer.h"
 
 #define max(a,b) ((a)>(b))?(a):(b)
-#define FONT_SIZE 15
-#define FONT_WIDTH (FONT_SIZE*9/10)
+#define FONT_SIZE 20
+#define FONT_WIDTH FONT_SIZE
 #define FONT_HEIGHT FONT_SIZE
+#define SCRIPT_SIZE 0.7
 
 enum HAlign
 {
@@ -28,29 +29,36 @@ class Node
   protected:
     bool used;
     int scriptOffset,
-        width,
-        height;
+    width,
+    height;
     Node  *subscript,
           *supscript;
     std::wstring name;
   public:
-    virtual int getWidth(double multiplier = 1.) = 0;
-    virtual int getHeight(double multiplier = 1.) = 0;
+    virtual void calc(HDC hdc, double multiplier) = 0;
+    virtual int getWidth();
+    virtual int getHeight();
     virtual void draw(HDC hdc,
                       int x,
                       int y,
                       HAlign h = HA_CENTER,
                       VAlign v = VA_MIDDLE,
                       double multiplier = 1.
-                      ) = 0;
+                     ) = 0;
     virtual ~Node();
     Node(std::wstring str);
     virtual void enTree(std::vector<Node*>* stack, int index);
     virtual void checkScript(std::vector<Node*>* stack, unsigned int index);
     void setUse();
     bool isUsed();
-    std::wstring getName() {return name;}
-    virtual std::wstring put() {return L"";}
+    std::wstring getName()
+    {
+      return name;
+    }
+    virtual std::wstring put()
+    {
+      return L"";
+    }
     std::wstring putScripts();
     void setSuperScript(Node*);
     void setSubScript(Node*);
@@ -61,21 +69,23 @@ class Formula: public Node
   protected:
     std::vector<Node*> content;
   public:
-    virtual int getWidth(double multiplier = 1.);
-    virtual int getHeight(double multiplier = 1.);
+    virtual void calc(HDC hdc, double multiplier);
     virtual void draw(HDC hdc,
                       int x,
                       int y,
                       HAlign h = HA_CENTER,
                       VAlign v = VA_MIDDLE,
                       double multiplier = 1.
-                      );
+                     );
     Formula(std::vector<Token>*, int = 0, TokType = ENDLINE);
     void parse(std::vector<Token>*, int = 0, TokType = ENDLINE);
     virtual void enTree(std::vector<Node*>* stack, int index);
     virtual void checkScript(std::vector<Node*>* stack, unsigned int index);
     virtual ~Formula();
-    std::vector<Node*>* getContent() {return &content;}
+    std::vector<Node*>* getContent()
+    {
+      return &content;
+    }
     virtual std::wstring put();
 };
 
@@ -83,15 +93,14 @@ class Lexem: public Node
 {
   protected:
   public:
-    virtual int getWidth(double multiplier = 1.);
-    virtual int getHeight(double multiplier = 1.);
+    virtual void calc(HDC hdc, double multiplier);
     virtual void draw(HDC hdc,
                       int x,
                       int y,
                       HAlign h = HA_CENTER,
                       VAlign v = VA_MIDDLE,
                       double multiplier = 1.
-                      );
+                     );
     Lexem(std::wstring str = L""): Node(str) {}
     virtual std::wstring put();
 };
@@ -108,19 +117,26 @@ class Unary: public Operation
     Unary* actual;
     Node *operand;
   public:
-    virtual int getWidth(double multiplier = 1.);
-    virtual int getHeight(double multiplier = 1.);
+    virtual void calc(HDC hdc, double multiplier);
+    virtual int getWidth();
+    virtual int getHeight();
     virtual void draw(HDC hdc,
                       int x,
                       int y,
                       HAlign h = HA_CENTER,
                       VAlign v = VA_MIDDLE,
                       double multiplier = 1.
-                      );
+                     );
     Unary(std::wstring str);
     virtual ~Unary();
-    Node* getOperand() {return operand;}
-    void setOperand(Node* n) {operand = n;}
+    Node* getOperand()
+    {
+      return operand;
+    }
+    void setOperand(Node* n)
+    {
+      operand = n;
+    }
     virtual std::wstring put();
 };
 
@@ -129,10 +145,11 @@ class Binary: public Operation
   protected:
     Binary* actual;
     Node  *leftOperand,
-          *rightOperand;
+    *rightOperand;
   public:
-    virtual int getWidth(double multiplier = 1.);
-    virtual int getHeight(double multiplier = 1.);
+    virtual void calc(HDC hdc, double multiplier);
+    virtual int getWidth();
+    virtual int getHeight();
     virtual void draw(HDC hdc,
                       int x,
                       int y,
@@ -142,10 +159,22 @@ class Binary: public Operation
                      );
     Binary(std::wstring str);
     virtual ~Binary();
-    Node* getLeft() {return leftOperand;}
-    Node* getRight() {return rightOperand;}
-    void setLeft(Node* n) {leftOperand = n;}
-    void setRight(Node* n) {rightOperand = n;}
+    Node* getLeft()
+    {
+      return leftOperand;
+    }
+    Node* getRight()
+    {
+      return rightOperand;
+    }
+    void setLeft(Node* n)
+    {
+      leftOperand = n;
+    }
+    void setRight(Node* n)
+    {
+      rightOperand = n;
+    }
     virtual std::wstring put();
 };
 

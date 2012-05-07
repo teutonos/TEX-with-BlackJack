@@ -1,28 +1,34 @@
 #include "tex.h"
 #include "winwrap.h"
 
-int Formula::getWidth(double multiplier)
+int Node::getWidth()
+{
+  return width;
+}
+
+int Node::getHeight()
+{
+  return height;
+}
+
+void Formula::calc(HDC hdc, double multiplier)
 {
   if (width == 0)
   {
     for (unsigned int i = 0; i < content.size(); i++)
     {
+      content[i]->calc(hdc, multiplier);
       width += content[i]->getWidth();
     }
   }
-  return width * multiplier;
-}
-
-int Formula::getHeight(double multiplier)
-{
   if (height == 0)
   {
     for (unsigned int i = 0; i < content.size(); i++)
     {
+      content[i]->calc(hdc, multiplier);
       height = max(height, content[i]->getHeight());
     }
   }
-  return height * multiplier;
 }
 
 void Formula::draw(HDC hdc,
@@ -33,56 +39,61 @@ void Formula::draw(HDC hdc,
                    double multiplier
                   )
 {
+  calc(hdc, multiplier);
   switch(h)
   {
     case HA_LEFT:
       break;
     case HA_CENTER:
-      x -= getWidth(multiplier) / 2;
+      x -= getWidth() / 2;
       break;
     case HA_RIGHT:
-      x -= getWidth(multiplier);
+      x -= getWidth();
       break;
   }
   switch(v)
   {
     case VA_TOP:
+      y += getHeight() / 2;
       break;
     case VA_MIDDLE:
-      y -= getHeight(multiplier) / 2;
       break;
     case VA_BOTTOM:
-      y -= getHeight(multiplier);
+      y -= getHeight() / 2;
       break;
   }
 
   for (unsigned int i = 0; i < content.size(); i++)
   {
-  	content[i]->draw(hdc, x, y, HA_LEFT, VA_TOP, multiplier);
-  	x += content[i]->getWidth(multiplier);
+    content[i]->draw(hdc, x, y, HA_LEFT, VA_MIDDLE, multiplier);
+    x += content[i]->getWidth();
   }
 
   if (supscript != NULL)
   {
-    supscript->draw(hdc, x, y, HA_CENTER, VA_BOTTOM, multiplier * 0.5);
+    y -= getHeight() / 2;
+    supscript->draw(hdc, x, y, HA_CENTER, VA_BOTTOM, multiplier * SCRIPT_SIZE);
+    y += getHeight() / 2;
   }
 
   if (subscript != NULL)
   {
-    y += getHeight(multiplier);
-    subscript->draw(hdc, x, y, HA_CENTER, VA_TOP, multiplier * 0.5);
-    y -= getHeight(multiplier);
+    y += getHeight() / 2;
+    subscript->draw(hdc, x, y, HA_CENTER, VA_TOP, multiplier * SCRIPT_SIZE);
+    y -= getHeight() / 2;
   }
 }
 
-int Lexem::getWidth(double multiplier)
+void Lexem::calc(HDC hdc, double multiplier)
 {
-  return (width = FONT_WIDTH * name.length()) * multiplier;
-}
-
-int Lexem::getHeight(double multiplier)
-{
-  return (height = FONT_HEIGHT) * multiplier;
+  if (width * height == 0)
+  {
+    winWrap::setFont(hdc, FONT_SIZE * multiplier);
+    RECT r;
+    DrawTextW(hdc, name.data(), name.length(), &r, DT_CALCRECT);
+    width = r.right - r.left;
+    height = r.bottom - r.top;
+  }
 }
 
 void Lexem::draw(HDC hdc,
@@ -93,15 +104,16 @@ void Lexem::draw(HDC hdc,
                  double multiplier
                 )
 {
+  calc(hdc, multiplier);
   switch(h)
   {
     case HA_LEFT:
       break;
     case HA_CENTER:
-      x -= getWidth(multiplier) / 2;
+      x -= getWidth() / 2;
       break;
     case HA_RIGHT:
-      x -= getWidth(multiplier);
+      x -= getWidth();
       break;
   }
   switch(v)
@@ -109,10 +121,10 @@ void Lexem::draw(HDC hdc,
     case VA_TOP:
       break;
     case VA_MIDDLE:
-      y -= getHeight(multiplier) / 2;
+      y -= getHeight() / 2;
       break;
     case VA_BOTTOM:
-      y -= getHeight(multiplier);
+      y -= getHeight();
       break;
   }
 
@@ -120,37 +132,42 @@ void Lexem::draw(HDC hdc,
 
   TextOutW(hdc, x, y, name.data(), name.length());
 
-  x += getWidth(multiplier);
+  x += getWidth();
 
   if (supscript != NULL)
   {
-    supscript->draw(hdc, x, y, HA_LEFT, VA_MIDDLE, multiplier * 0.7);
+    supscript->draw(hdc, x, y, HA_LEFT, VA_MIDDLE, multiplier * SCRIPT_SIZE);
   }
 
   if (subscript != NULL)
   {
-    y += getHeight(multiplier);
-    subscript->draw(hdc, x, y, HA_LEFT, VA_TOP, multiplier * 0.7);
-    y -= getHeight(multiplier);
+    y += getHeight();
+    subscript->draw(hdc, x, y, HA_LEFT, VA_MIDDLE, multiplier * SCRIPT_SIZE);
+    y -= getHeight();
   }
 }
 
-int Unary::getWidth(double multiplier)
+void Unary::calc(HDC hdc, double multiplier)
+{
+  actual->calc(hdc, multiplier);
+}
+
+int Unary::getWidth()
 {
   if (width == 0)
   {
     width = actual->getWidth();
   }
-  return width * multiplier;
+  return width;
 }
 
-int Unary::getHeight(double multiplier)
+int Unary::getHeight()
 {
   if (height == 0)
   {
     height = actual->getHeight();
   }
-  return height * multiplier;
+  return height;
 }
 
 void Unary::draw(HDC hdc,
@@ -164,22 +181,27 @@ void Unary::draw(HDC hdc,
   actual->draw(hdc, x, y, h, v, multiplier);
 }
 
-int Binary::getWidth(double multiplier)
+void Binary::calc(HDC hdc, double multiplier)
+{
+  actual->calc(hdc, multiplier);
+}
+
+int Binary::getWidth()
 {
   if (width == 0)
   {
     width = actual->getWidth();
   }
-  return width * multiplier;
+  return width;
 }
 
-int Binary::getHeight(double multiplier)
+int Binary::getHeight()
 {
   if (height == 0)
   {
     height = actual->getHeight();
   }
-  return height * multiplier;
+  return height;
 }
 
 void Binary::draw(HDC hdc,

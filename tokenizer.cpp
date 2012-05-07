@@ -183,7 +183,7 @@ std::vector<Token>* tokenize(std::wstring str)
 
   for (unsigned int i = 0; i < result->size() - 2; i++)
   {
-  	if (((*result)[i].type == OPEN_BRACKET) &&
+    if (((*result)[i].type == OPEN_BRACKET) &&
         ((*result)[i+2].type == CLOSE_BRACKET))
     {
       result->erase(result->begin() + i + 2);

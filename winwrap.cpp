@@ -2,8 +2,8 @@
 
 HFONT winWrap::createFont(int size)
 {
-  return CreateFontA(size * 1.5,
-                     size,
+  return CreateFontW(size,
+                     0,
                      0,
                      0,
                      FW_DONTCARE,
@@ -15,13 +15,13 @@ HFONT winWrap::createFont(int size)
                      CLIP_DEFAULT_PRECIS,
                      PROOF_QUALITY,
                      VARIABLE_PITCH,
-                     TEXT("Courier New")
+                     L"Courier New"
                     );
 }
 
 HFONT winWrap::createFont(int vsize, int hsize)
 {
-  return CreateFontA(vsize * 1.5,
+  return CreateFontW(vsize,
                      hsize,
                      0,
                      0,
@@ -34,7 +34,7 @@ HFONT winWrap::createFont(int vsize, int hsize)
                      CLIP_DEFAULT_PRECIS,
                      PROOF_QUALITY,
                      VARIABLE_PITCH,
-                     TEXT("Courier New")
+                     L"Courier New"
                     );
 }
 
