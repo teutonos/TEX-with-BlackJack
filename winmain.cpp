@@ -9,7 +9,7 @@ HWND hMainWnd, hInputWnd, hOutputWnd, hButtonWnd;
 Formula* expression;
    int x = 600;
    int y = 300;
-   int b = 4;
+   int b =  4;
 // функция WinMain
 int APIENTRY WinMain(HINSTANCE hInstance,
                      HINSTANCE hPrevInstance,
