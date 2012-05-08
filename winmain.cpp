@@ -9,7 +9,7 @@ HWND hMainWnd, hInputWnd, hOutputWnd, hButtonWnd;
 Formula* expression;
    int x = 600;
    int y = 300;
-   int b = 5;
+   int b = 4;
 // функция WinMain
 int APIENTRY WinMain(HINSTANCE hInstance,
                      HINSTANCE hPrevInstance,
@@ -31,7 +31,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
   // создание диалогового окна
   hMainWnd = //главное окно
   CreateWindow (WinClass, "TEX Editor v.1.61803399",
-                WS_SYSMENU  | WS_VISIBLE | WS_SIZEBOX  ,
+                WS_TILEDWINDOW  | WS_VISIBLE   ,
                 ox, oy, x+6, y+40,
                 NULL, NULL, hInstance, NULL);
 
@@ -59,7 +59,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
   SendMessage(hInputWnd, WM_SETFONT,(WPARAM)hFont, 0);
 
   hButtonWnd = //кнопка
-  CreateWindow ("BUTTON",	"Вогнать!",
+  CreateWindow ("BUTTON",	"Нажми меня!",
                 WS_VISIBLE | WS_CHILD | WS_BORDER ,
                 x-b-100, y-b-30, 100, 30,
                 hMainWnd, NULL, hInstance, NULL );
