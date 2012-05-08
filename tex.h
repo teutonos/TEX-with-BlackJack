@@ -61,6 +61,8 @@ class Node
     void setSubScript(Node*);
     Node* getSuperScript() {return supscript;}
     Node* getSubScript() {return subscript;}
+    virtual int getSuperScriptHeight();
+    virtual int getSubScriptHeight();
 };
 
 class Formula: public Node
@@ -86,6 +88,8 @@ class Formula: public Node
       return &content;
     }
     virtual std::wstring put();
+    virtual int getSuperScriptHeight();
+    virtual int getSubScriptHeight();
 };
 
 class Lexem: public Node
