@@ -12,7 +12,7 @@
 #define FONT_SIZE 20
 #define FONT_WIDTH FONT_SIZE
 #define FONT_HEIGHT FONT_SIZE
-#define SCRIPT_SIZE 0.7
+#define SCRIPT_SIZE 0.78
 
 enum HAlign
 {

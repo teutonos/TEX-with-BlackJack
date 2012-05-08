@@ -109,6 +109,8 @@ void Over::draw(HDC hdc, int x, int y, HAlign h, VAlign v, double multiplier)
       break;
   }
 
+  x += FONT_WIDTH / 2;
+
   Rectangle(hdc, x, y, x + getWidth(), y + 1);
 
   x += getWidth() / 2;
