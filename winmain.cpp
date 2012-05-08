@@ -31,7 +31,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
   // создание диалогового окна
   hMainWnd = //главное окно
   CreateWindow (WinClass, "TEX Editor v.1.61803399",
-                WS_TILEDWINDOW  | WS_VISIBLE   ,
+                WS_TILEDWINDOW  | WS_VISIBLE,
                 ox, oy, x+6, y+40,
                 NULL, NULL, hInstance, NULL);
 
@@ -114,10 +114,10 @@ LRESULT CALLBACK MainWndProc(
     {
     case BN_CLICKED:
       std::wstring inputString(L"{}");
-      char str[100];
-      wchar_t wstr[100];
-      GetWindowText(hInputWnd, str, 100);
-      mbstowcs(wstr, str, 100);
+      char str[256];
+      wchar_t wstr[256];
+      GetWindowText(hInputWnd, str, 256);
+      mbstowcs(wstr, str, 256);
       if (wstr[0] != L'\0') { inputString = wstr; }
       if (expression) { delete expression; }
       expression = makeTreeStack(inputString);
