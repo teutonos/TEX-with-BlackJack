@@ -41,25 +41,25 @@ int APIENTRY WinMain(HINSTANCE hInstance,
                 b, (y-4*b-30)*2/3+2*b, x-2*b, (y-4*b-30)/3,
                 hMainWnd, NULL,	hInstance, NULL );
 
-  HFONT	 hFont = CreateFont (17,
-                     9,
-                     0,
-                     0,
-                     FW_DONTCARE,
-                     0,
-                     0,
-                     0,
-                     ANSI_CHARSET,
-                     OUT_OUTLINE_PRECIS,
-                     CLIP_DEFAULT_PRECIS,
-                     PROOF_QUALITY,
-                     VARIABLE_PITCH,
-                     TEXT("Courier New")
-                    );
-                    SendMessage(hInputWnd,WM_SETFONT, (WPARAM)hFont,0);
+   HFONT hFont =
+   CreateFont (16,
+               0,
+               0,
+               0,
+               FW_DONTCARE,
+               0,
+               0,
+               0,
+               ANSI_CHARSET,
+               OUT_OUTLINE_PRECIS,
+               CLIP_DEFAULT_PRECIS,
+               DRAFT_QUALITY,
+               VARIABLE_PITCH,
+               TEXT("Courier New"));
+  SendMessage(hInputWnd, WM_SETFONT,(WPARAM)hFont, 0);
 
   hButtonWnd = //кнопка
-  CreateWindow ("BUTTON",	"OK",
+  CreateWindow ("BUTTON",	"Вогнать!",
                 WS_VISIBLE | WS_CHILD | WS_BORDER ,
                 x-b-100, y-b-30, 100, 30,
                 hMainWnd, NULL, hInstance, NULL );
