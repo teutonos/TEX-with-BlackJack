@@ -38,16 +38,18 @@ HFONT winWrap::createFont(int vsize, int hsize)
                     );
 }
 
-void winWrap::setFont (HDC hdc, int size)
+HFONT winWrap::setFont (HDC hdc, int size)
 {
   HFONT hFont = createFont(size);
   SelectObject(hdc, hFont);
   SetBkMode(hdc, TRANSPARENT);
+  return hFont;
 }
 
-void winWrap::setFont (HDC hdc, int vsize, int hsize)
+HFONT winWrap::setFont (HDC hdc, int vsize, int hsize)
 {
   HFONT hFont = createFont(vsize, hsize);
   SelectObject(hdc, hFont);
   SetBkMode(hdc, TRANSPARENT);
+  return hFont;
 }

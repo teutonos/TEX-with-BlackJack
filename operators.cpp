@@ -37,7 +37,7 @@ void Integral::draw(HDC hdc, int x, int y, HAlign h, VAlign v, double multiplier
       break;
   }
 
-  winWrap::setFont(hdc,
+  HFONT hf = winWrap::setFont(hdc,
                    getHeight() * INTEGRAL_KOEF,
                    FONT_WIDTH * multiplier
                   );
@@ -49,6 +49,7 @@ void Integral::draw(HDC hdc, int x, int y, HAlign h, VAlign v, double multiplier
            name.length()
           );
   y += getHeight() * (INT_TOP_OFF) * INTEGRAL_KOEF;
+  DeleteObject(hf);
 
   x += FONT_WIDTH * multiplier;
 

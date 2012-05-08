@@ -143,11 +143,12 @@ void Lexem::calc(HDC hdc, double multiplier)
 {
   if (width * height == 0)
   {
-    winWrap::setFont(hdc, FONT_SIZE * multiplier);
+    HFONT hf = winWrap::setFont(hdc, FONT_SIZE * multiplier);
     RECT r;
     DrawTextW(hdc, name.data(), name.length(), &r, DT_CALCRECT);
     width = r.right - r.left;
     height = r.bottom - r.top;
+    DeleteObject(hf);
 
     int scr_w = 0;
     if (supscript != NULL)
@@ -198,9 +199,9 @@ void Lexem::draw(HDC hdc,
   }
 //  Rectangle(hdc, x, y, x+width, y+height);
 
-  winWrap::setFont(hdc, FONT_SIZE * multiplier);
-
+  HFONT hf = winWrap::setFont(hdc, FONT_SIZE * multiplier);
   TextOutW(hdc, x, y, name.data(), name.length());
+  DeleteObject(hf);
 
   x += getWidth();
   y += getHeight() / 2;
