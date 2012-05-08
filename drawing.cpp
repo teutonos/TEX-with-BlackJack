@@ -1,5 +1,6 @@
 #include "tex.h"
 #include "winwrap.h"
+#include <cstdio>
 
 int Node::getWidth()
 {
@@ -9,6 +10,50 @@ int Node::getWidth()
 int Node::getHeight()
 {
   return height;
+}
+
+int Node::getSubScriptHeight()
+{
+  if (subscript)
+    return subscript->getHeight();
+  else
+    return 0;
+}
+
+int Node::getSuperScriptHeight()
+{
+  if (supscript)
+    return supscript->getHeight();
+  else
+    return 0;
+}
+
+int Formula::getSubScriptHeight()
+{
+  int h = 0;
+  if (subscript)
+  {
+    h = subscript->getHeight();
+  }
+  for (unsigned int i = 0; i < content.size(); i++)
+  {
+    h = max(h, content[i]->getSubScriptHeight());
+  }
+  return h;
+}
+
+int Formula::getSuperScriptHeight()
+{
+  int h = 0;
+  if (supscript)
+  {
+    h = supscript->getHeight();
+  }
+  for (unsigned int i = 0; i < content.size(); i++)
+  {
+    h = max(h, content[i]->getSuperScriptHeight());
+  }
+  return h;
 }
 
 void Formula::calc(HDC hdc, double multiplier)
@@ -24,13 +69,13 @@ void Formula::calc(HDC hdc, double multiplier)
 
     if (supscript != NULL)
     {
-      supscript->calc(hdc, multiplier);
+      supscript->calc(hdc, multiplier * SCRIPT_SIZE);
       scr_w = supscript->getWidth();
     }
 
     if (subscript != NULL)
     {
-      subscript->calc(hdc, multiplier);
+      subscript->calc(hdc, multiplier * SCRIPT_SIZE);
       scr_w = max(scr_w, subscript->getWidth());
     }
     width += scr_w;
@@ -85,16 +130,12 @@ void Formula::draw(HDC hdc,
 
   if (supscript != NULL)
   {
-    y -= getHeight() / 2;
-    supscript->draw(hdc, x, y, HA_LEFT, VA_MIDDLE, multiplier * SCRIPT_SIZE);
-    y += getHeight() / 2;
+    supscript->draw(hdc, x, y, HA_LEFT, VA_BOTTOM, multiplier * SCRIPT_SIZE);
   }
 
   if (subscript != NULL)
   {
-    y += getHeight() / 2;
-    subscript->draw(hdc, x, y, HA_LEFT, VA_MIDDLE, multiplier * SCRIPT_SIZE);
-    y -= getHeight() / 2;
+    subscript->draw(hdc, x, y, HA_LEFT, VA_TOP, multiplier * SCRIPT_SIZE);
   }
 }
 
