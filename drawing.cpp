@@ -72,14 +72,14 @@ void Formula::draw(HDC hdc,
   if (supscript != NULL)
   {
     y -= getHeight() / 2;
-    supscript->draw(hdc, x, y, HA_CENTER, VA_BOTTOM, multiplier * SCRIPT_SIZE);
+    supscript->draw(hdc, x, y, HA_LEFT, VA_MIDDLE, multiplier * SCRIPT_SIZE);
     y += getHeight() / 2;
   }
 
   if (subscript != NULL)
   {
     y += getHeight() / 2;
-    subscript->draw(hdc, x, y, HA_CENTER, VA_TOP, multiplier * SCRIPT_SIZE);
+    subscript->draw(hdc, x, y, HA_LEFT, VA_MIDDLE, multiplier * SCRIPT_SIZE);
     y -= getHeight() / 2;
   }
 }
