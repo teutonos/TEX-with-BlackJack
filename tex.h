@@ -55,13 +55,12 @@ class Node
     {
       return name;
     }
-    virtual std::wstring put()
-    {
-      return L"";
-    }
+    virtual std::wstring put() = 0;
     std::wstring putScripts();
     void setSuperScript(Node*);
     void setSubScript(Node*);
+    Node* getSuperScript() {return supscript;}
+    Node* getSubScript() {return subscript;}
 };
 
 class Formula: public Node

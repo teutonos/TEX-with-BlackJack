@@ -109,22 +109,24 @@ void Over::draw(HDC hdc, int x, int y, HAlign h, VAlign v, double multiplier)
       break;
   }
 
-  x += FONT_WIDTH / 2;
-
   Rectangle(hdc, x, y, x + getWidth(), y + 1);
 
   x += getWidth() / 2;
 
   {
-    y -= FONT_SIZE * multiplier / 4;
+    if (leftOperand->getSubScript() != NULL)
+      y -= leftOperand->getSubScript()->getHeight() - leftOperand->getHeight() / 2;
     leftOperand->draw(hdc, x, y, HA_CENTER, VA_BOTTOM, FRACTION_KOEF * multiplier);
-    y += FONT_SIZE * multiplier / 4;
+    if (leftOperand->getSubScript() != NULL)
+      y += leftOperand->getSubScript()->getHeight() - leftOperand->getHeight() / 2;
   }
 
   {
-    y += FONT_SIZE * multiplier / 4;
+    if (rightOperand->getSuperScript() != NULL)
+      y += rightOperand->getSuperScript()->getHeight() - rightOperand->getHeight() / 2;
     rightOperand->draw(hdc, x, y, HA_CENTER, VA_TOP, FRACTION_KOEF * multiplier);
-    y -= FONT_SIZE * multiplier / 4;
+    if (rightOperand->getSuperScript() != NULL)
+      y -= rightOperand->getSuperScript()->getHeight() - rightOperand->getHeight() / 2;
   }
 }
 

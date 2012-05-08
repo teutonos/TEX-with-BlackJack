@@ -20,6 +20,20 @@ void Formula::calc(HDC hdc, double multiplier)
       content[i]->calc(hdc, multiplier);
       width += content[i]->getWidth();
     }
+    int scr_w = 0;
+
+    if (supscript != NULL)
+    {
+      supscript->calc(hdc, multiplier);
+      scr_w = supscript->getWidth();
+    }
+
+    if (subscript != NULL)
+    {
+      subscript->calc(hdc, multiplier);
+      scr_w = max(scr_w, subscript->getWidth());
+    }
+    width += scr_w;
   }
   if (height == 0)
   {
@@ -93,6 +107,20 @@ void Lexem::calc(HDC hdc, double multiplier)
     DrawTextW(hdc, name.data(), name.length(), &r, DT_CALCRECT);
     width = r.right - r.left;
     height = r.bottom - r.top;
+
+    int scr_w = 0;
+    if (supscript != NULL)
+    {
+      supscript->calc(hdc, multiplier * SCRIPT_SIZE);
+      scr_w = supscript->getWidth();
+    }
+
+    if (subscript != NULL)
+    {
+      subscript->calc(hdc, multiplier * SCRIPT_SIZE);
+      scr_w = max(scr_w, subscript->getWidth());
+    }
+    width += scr_w;
   }
 }
 
@@ -127,23 +155,40 @@ void Lexem::draw(HDC hdc,
       y -= getHeight();
       break;
   }
+//  Rectangle(hdc, x, y, x+width, y+height);
 
   winWrap::setFont(hdc, FONT_SIZE * multiplier);
 
   TextOutW(hdc, x, y, name.data(), name.length());
 
   x += getWidth();
+  y += getHeight() / 2;
+
+  int scr_w = 0;
 
   if (supscript != NULL)
   {
-    supscript->draw(hdc, x, y, HA_LEFT, VA_MIDDLE, multiplier * SCRIPT_SIZE);
+    scr_w = supscript->getWidth();
   }
 
   if (subscript != NULL)
   {
-    y += getHeight();
-    subscript->draw(hdc, x, y, HA_LEFT, VA_MIDDLE, multiplier * SCRIPT_SIZE);
-    y -= getHeight();
+    scr_w = max(scr_w, subscript->getWidth());
+  }
+
+
+  if (supscript != NULL)
+  {
+    x -= scr_w;
+    supscript->draw(hdc, x, y, HA_LEFT, VA_BOTTOM, multiplier * SCRIPT_SIZE);
+    x += scr_w;
+  }
+
+  if (subscript != NULL)
+  {
+    x -= scr_w;
+    subscript->draw(hdc, x, y, HA_LEFT, VA_TOP, multiplier * SCRIPT_SIZE);
+    x += scr_w;
   }
 }
 
