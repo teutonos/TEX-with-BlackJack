@@ -8,7 +8,8 @@
 
 #include "tokenizer.h"
 
-#define max(a,b) ((a)>(b))?(a):(b)
+#define max(a,b) (((a)>(b))?(a):(b))
+#define min(a,b) (((a)<(b))?(a):(b))
 #define FONT_SIZE 20
 #define FONT_WIDTH FONT_SIZE
 #define FONT_HEIGHT FONT_SIZE
@@ -29,8 +30,12 @@ class Node
   protected:
     bool used;
     int scriptOffset,
-    width,
-    height;
+        width,
+        height,
+        bbTop,
+        bbLeft,
+        bbBottom,
+        bbRight;
     Node  *subscript,
           *supscript;
     std::wstring name;
@@ -63,6 +68,10 @@ class Node
     Node* getSubScript() {return subscript;}
     virtual int getSuperScriptHeight();
     virtual int getSubScriptHeight();
+    virtual int getBBoxTop();
+    virtual int getBBoxLeft();
+    virtual int getBBoxBottom();
+    virtual int getBBoxRight();
 };
 
 class Formula: public Node

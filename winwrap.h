@@ -5,10 +5,8 @@
 
 namespace winWrap
 {
-  HFONT createFont(int size);
-  HFONT createFont(int vsize, int hsize);
-  HFONT setFont (HDC hdc, int size);
-  HFONT setFont (HDC hdc, int vsize, int hsize);
+  HFONT createFont(int vsize, int hsize = 0);
+  HFONT setFont (HDC hdc, int vsize, int hsize = 0);
 }
 
 #endif // WINWRAP_H

@@ -28,6 +28,26 @@ int Node::getSuperScriptHeight()
     return 0;
 }
 
+int Node::getBBoxTop()
+{
+  return bbTop;
+}
+
+int Node::getBBoxLeft()
+{
+  return bbLeft;
+}
+
+int Node::getBBoxBottom()
+{
+  return bbBottom;
+}
+
+int Node::getBBoxRight()
+{
+  return bbRight;
+}
+
 int Formula::getSubScriptHeight()
 {
   int h = 0;
@@ -99,6 +119,7 @@ void Formula::draw(HDC hdc,
                   )
 {
   calc(hdc, multiplier);
+
   switch(h)
   {
     case HA_LEFT:
@@ -122,19 +143,28 @@ void Formula::draw(HDC hdc,
       break;
   }
 
+  bbLeft = x;
+  bbRight = x + getWidth();
+  bbTop = y;
+  bbBottom = y;
+
   for (unsigned int i = 0; i < content.size(); i++)
   {
     content[i]->draw(hdc, x, y, HA_LEFT, VA_MIDDLE, multiplier);
     x += content[i]->getWidth();
+    bbTop = min(bbTop, content[i]->getBBoxTop());
+    bbBottom = max(bbBottom, content[i]->getBBoxBottom());
   }
 
   if (supscript != NULL)
   {
+    bbTop -= supscript->getHeight() - (y - bbTop);
     supscript->draw(hdc, x, y, HA_LEFT, VA_BOTTOM, multiplier * SCRIPT_SIZE);
   }
 
   if (subscript != NULL)
   {
+    bbBottom += subscript->getHeight() + (y - bbBottom);
     subscript->draw(hdc, x, y, HA_LEFT, VA_TOP, multiplier * SCRIPT_SIZE);
   }
 }
@@ -150,19 +180,22 @@ void Lexem::calc(HDC hdc, double multiplier)
     height = r.bottom - r.top;
     DeleteObject(hf);
 
-    int scr_w = 0;
+    int scr_w = 0, h = 0;
     if (supscript != NULL)
     {
       supscript->calc(hdc, multiplier * SCRIPT_SIZE);
       scr_w = supscript->getWidth();
+      h = height / 2;
     }
 
     if (subscript != NULL)
     {
       subscript->calc(hdc, multiplier * SCRIPT_SIZE);
       scr_w = max(scr_w, subscript->getWidth());
+      h += height / 2;
     }
     width += scr_w;
+    height += getSubScriptHeight() + getSuperScriptHeight() - h;
   }
 }
 
@@ -199,6 +232,9 @@ void Lexem::draw(HDC hdc,
   }
 //  Rectangle(hdc, x, y, x+width, y+height);
 
+  bbTop = y;
+  bbBottom = y + getHeight();
+
   HFONT hf = winWrap::setFont(hdc, FONT_SIZE * multiplier);
   TextOutW(hdc, x, y, name.data(), name.length());
   DeleteObject(hf);
@@ -221,6 +257,7 @@ void Lexem::draw(HDC hdc,
 
   if (supscript != NULL)
   {
+    bbTop -= supscript->getHeight() - (y - bbTop);
     x -= scr_w;
     supscript->draw(hdc, x, y, HA_LEFT, VA_BOTTOM, multiplier * SCRIPT_SIZE);
     x += scr_w;
@@ -228,6 +265,7 @@ void Lexem::draw(HDC hdc,
 
   if (subscript != NULL)
   {
+    bbBottom += subscript->getHeight() + (y - bbBottom);
     x -= scr_w;
     subscript->draw(hdc, x, y, HA_LEFT, VA_TOP, multiplier * SCRIPT_SIZE);
     x += scr_w;
@@ -266,6 +304,10 @@ void Unary::draw(HDC hdc,
                 )
 {
   actual->draw(hdc, x, y, h, v, multiplier);
+  bbLeft = actual->getBBoxLeft();
+  bbTop  = actual->getBBoxTop();
+  bbRight = actual->getBBoxRight();
+  bbBottom  = actual->getBBoxBottom();
 }
 
 void Binary::calc(HDC hdc, double multiplier)
@@ -299,4 +341,8 @@ void Binary::draw(HDC hdc,
                   double multiplier)
 {
   actual->draw(hdc, x, y, h, v, multiplier);
+  bbLeft = actual->getBBoxLeft();
+  bbTop  = actual->getBBoxTop();
+  bbRight = actual->getBBoxRight();
+  bbBottom  = actual->getBBoxBottom();
 }

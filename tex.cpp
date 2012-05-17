@@ -78,8 +78,10 @@ Node::Node(std::wstring str = L"")
   subscript = supscript = NULL;
   name = str;
   used = false;
-  width = 0;
-  height = 0;
+  width =
+  height =
+  bbLeft =
+  bbTop = 0;
 }
 
 Unary::Unary(std::wstring str): Operation(str)

@@ -6,7 +6,7 @@
 #define INTEGRAL_KOEF (3./2)
 #define INT_TOP_OFF (3./15)
 #define INT_BOTT_OFF (2./15)
-#define FRACTION_KOEF 0.95
+#define FRACTION_KOEF 1.
 
 class Integral: public unary::Prefix
 {

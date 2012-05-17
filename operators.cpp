@@ -6,8 +6,11 @@ void Integral::calc(HDC hdc, double multiplier)
   if (width*height == 0)
   {
     operand->calc(hdc, multiplier);
-    width = FONT_WIDTH + operand->getWidth();
-    height = operand->getHeight() + FONT_HEIGHT;
+    width = FONT_WIDTH * multiplier + operand->getWidth();
+    height = operand->getHeight() +
+             FONT_HEIGHT * multiplier +
+             getSubScriptHeight() +
+             getSuperScriptHeight();
   }
 }
 
@@ -37,10 +40,13 @@ void Integral::draw(HDC hdc, int x, int y, HAlign h, VAlign v, double multiplier
       break;
   }
 
+  bbTop = y;
+  bbBottom = y + getHeight();
+
   HFONT hf = winWrap::setFont(hdc,
-                   getHeight() * INTEGRAL_KOEF,
-                   FONT_WIDTH * multiplier
-                  );
+                              getHeight() * INTEGRAL_KOEF,
+                              FONT_WIDTH * multiplier
+                             );
   y -= getHeight() * (INT_TOP_OFF) * INTEGRAL_KOEF;
   TextOutW(hdc,
            x,
@@ -59,6 +65,7 @@ void Integral::draw(HDC hdc, int x, int y, HAlign h, VAlign v, double multiplier
   if (supscript != NULL)
   {
     y -= getHeight() / 2;
+    bbTop = y - supscript->getHeight();
     supscript->draw(hdc, x, y, HA_RIGHT, VA_BOTTOM, multiplier * SCRIPT_SIZE);
     y += getHeight() / 2;
   }
@@ -66,6 +73,7 @@ void Integral::draw(HDC hdc, int x, int y, HAlign h, VAlign v, double multiplier
   if (subscript != NULL)
   {
     y += getHeight() / 2;
+    bbBottom = y + subscript->getHeight();
     subscript->draw(hdc, x, y, HA_RIGHT, VA_TOP, multiplier * SCRIPT_SIZE);
     y -= getHeight() / 2;
   }
@@ -81,7 +89,7 @@ void Over::calc(HDC hdc, double multiplier)
   leftOperand->calc(hdc, multiplier * FRACTION_KOEF);
   rightOperand->calc(hdc, multiplier * FRACTION_KOEF);
   width = max(leftOperand->getWidth(), rightOperand->getWidth());
-  height = leftOperand->getHeight() + rightOperand->getHeight();
+  height = max(leftOperand->getHeight(), rightOperand->getHeight()) * 2;
 }
 
 void Over::draw(HDC hdc, int x, int y, HAlign h, VAlign v, double multiplier)
@@ -101,14 +109,17 @@ void Over::draw(HDC hdc, int x, int y, HAlign h, VAlign v, double multiplier)
   switch(v)
   {
     case VA_TOP:
-      y += getHeight() / 2;
+      y += leftOperand->getHeight();
       break;
     case VA_MIDDLE:
       break;
     case VA_BOTTOM:
-      y -= getHeight() / 2;
+      y -= rightOperand->getHeight();
       break;
   }
+
+  bbTop = y - leftOperand->getHeight();
+  bbBottom = y + rightOperand->getHeight();
 
   Rectangle(hdc, x, y, x + getWidth(), y + 1);
 
