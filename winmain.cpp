@@ -16,8 +16,8 @@ char* GetFileName();
 //глобализация окон
 HWND hMainWnd, hInputWnd, hOutputWnd, hButtonWnd, hSaveWnd;
 Formula* expression;
-   int globalWeight = 600;
-   int globalHeight = 300;
+   int x = 600;
+   int y = 300;
    int border = 4;
 // функция WinMain
 int APIENTRY WinMain(HINSTANCE hInstance,
@@ -34,26 +34,23 @@ int APIENTRY WinMain(HINSTANCE hInstance,
   // вычисление координат центра экрана
   RECT screenRect;
   GetWindowRect(GetDesktopWindow(), &screenRect); // разрешение экрана
-  int globalRight = (screenRect.right - globalWeight) / 2;
-  int globalTop = (screenRect.bottom - globalWeight) / 2;
+  int globalRight = (screenRect.right - x) / 2;
+  int globalTop = (screenRect.bottom - y) / 2;
 
   // создание диалогового окна
   hMainWnd = //главное окно
   CreateWindow (WinClass, "TEX Editor v.1.61803399",
                 WS_TILEDWINDOW  | WS_VISIBLE,
-                globalRight,
-                globalTop, 
-                globalWeight+6, 
-                globalWeight+40,
+                globalRight, globalTop, x+6, y+40,
                 NULL, NULL, hInstance, NULL);
 
   hInputWnd = //поле ввода
   CreateWindow ("EDIT", NULL,
                 WS_VISIBLE | WS_CHILD | WS_BORDER | WS_VSCROLL | WS_HSCROLL | ES_MULTILINE | ES_WANTRETURN,
                 border,
-                (globalWeight-4*border-30)*2/3+2*border,
-                globalWeight-2*border,
-                (globalWeight-4*border-30)/3,
+                (y-4*border-30)*2/3+2*border,
+                x-2*border,
+                (y-4*border-30)/3,
                 hMainWnd, NULL,	hInstance, NULL );
 
    HFONT hFont =
@@ -76,17 +73,13 @@ int APIENTRY WinMain(HINSTANCE hInstance,
   hButtonWnd = //кнопка подтверждения
   CreateWindow ("BUTTON",	"Нажми меня!",
                 WS_VISIBLE | WS_CHILD | WS_BORDER ,
-                globalWeight-border-100,
-                globalWeight-border-30, 
-                100, 30,
+                x-border-100, y-border-30, 100, 30,
                 hMainWnd, (HMENU) BUTTON_OK, hInstance, NULL );
 
   hSaveWnd = //кнопка сохранения картинки
   CreateWindow ("BUTTON", "Сохранить формулу",
                 WS_VISIBLE | WS_CHILD | WS_BORDER ,
-                border, 
-                globalWeight-border-30, 
-                150, 30,
+                border, y-border-30, 150, 30,
                 hMainWnd, (HMENU) BUTTON_SAVE, hInstance, NULL );
 
   SetFocus (hInputWnd); //установка фокуса курсора на окне Ввода
@@ -105,11 +98,11 @@ int APIENTRY WinMain(HINSTANCE hInstance,
     {
       i = 0;
       HDC hdc = GetDC(hMainWnd); // занимает окно для приложения
-      Rectangle (hdc, border, border, globalWeight-border, (globalWeight-4*border-30)*2/3+border);
+      Rectangle (hdc, border, border, x-border, (y-4*border-30)*2/3+border);
 
       if (expression)
       {
-        expression->draw(hdc, globalWeight/2, (globalWeight-4*border-30)/3);
+        expression->draw(hdc, x/2, (y-4*border-30)/3);
       }
 
       UpdateWindow (hMainWnd);
@@ -171,33 +164,20 @@ LRESULT CALLBACK MainWndProc(
         }
 
         char* fname;
-    	  fname = GetFileName();
+    	fname = GetFileName();
         WriteImage(fname, outRect);
         delete [] fname;
+        //
       }
       break;
     }
     case WM_SIZE:
       {
-        globalWeight = LOWORD(lParam);
-        globalWeight = HIWORD(lParam);
-
-        SetWindowPos(hInputWnd, NULL, 
-                     border,
-                     (globalWeight-4*border-30)*2/3+2*border, 
-                     globalWeight-2*border, 
-                     (globalWeight-4*border-30)/3, NULL);
-
-        SetWindowPos(hButtonWnd, NULL, 
-                     globalWeight-border-100, 
-                     globalWeight-border-30, 
-                     100, 30, NULL);
-
-        SetWindowPos(hSaveWnd, NULL, 
-                     border, 
-                     globalWeight-border-30, 
-                     150, 30, NULL);
-
+        x = LOWORD(lParam);
+        y = HIWORD(lParam);
+        SetWindowPos(hInputWnd, NULL, border, (y-4*border-30)*2/3+2*border, x-2*border, (y-4*border-30)/3, NULL);
+        SetWindowPos(hButtonWnd, NULL, x-border-100, y-border-30, 100, 30, NULL);
+        SetWindowPos(hSaveWnd, NULL, border, y-border-30, 150, 30, NULL);
         UpdateWindow (hMainWnd);
       }
       break;
@@ -212,12 +192,8 @@ LRESULT CALLBACK MainWndProc(
   }
 
   HDC hdc = GetDC(hMainWnd); // занимает окно для приложения
-
-  Rectangle (hdc, border, border, 
-             globalWeight-border, 
-             (globalWeight-4*border-30)*2/3+border);
-
-  if (expression) expression->draw(hdc, globalWeight/2, (globalWeight-4*border-30)/3);
+  Rectangle (hdc, border, border, x-border, (y-4*border-30)*2/3+border);
+  if (expression) expression->draw(hdc, x/2, (y-4*border-30)/3);
   UpdateWindow (hMainWnd);
   ReleaseDC(hMainWnd, hdc); // освобождает окно для других приложений
   UpdateWindow (hMainWnd);
