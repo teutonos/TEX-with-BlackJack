@@ -1,10 +1,13 @@
 #include <windows.h>
 #include <string>
+#include <StdIO.h>
 #include "tex.h"
 //проверка коммита
 // объ€вление функций
 LRESULT CALLBACK MainWndProc(HWND, UINT, WPARAM, LPARAM);
 ATOM RegMyWindowClass(HINSTANCE, LPCTSTR);
+VOID WriteImage (CHAR*, RECT);
+HBITMAP MakeClientSnapshot (RECT&);
 //глобализаци€ окон
 HWND hMainWnd, hInputWnd, hOutputWnd, hButtonWnd;
 Formula* expression;
@@ -82,7 +85,9 @@ int APIENTRY WinMain(HINSTANCE hInstance,
       i = 0;
       HDC hdc = GetDC(hMainWnd); // занимает окно дл€ приложени€
       Rectangle (hdc, b, b, x-b, (y-4*b-30)*2/3+b);
+
       if (expression) expression->draw(hdc, x/2, (y-4*b-30)/3);
+
       UpdateWindow (hMainWnd);
       ReleaseDC(hMainWnd, hdc); // освобождает окно дл€ других приложений
     }
@@ -122,6 +127,36 @@ LRESULT CALLBACK MainWndProc(
       if (wstr[0] != L'\0') { inputString = wstr; }
       if (expression) { delete expression; }
       expression = makeTreeStack(inputString);
+
+      //копирование картинки
+      HDC hdcScreen  = GetDC(hMainWnd);
+      HDC hdcCompatible = CreateCompatibleDC(hdcScreen);
+
+      HBITMAP hbmScreen = CreateCompatibleBitmap(hdcScreen, x, y);
+
+      SelectObject(hdcCompatible, hbmScreen);
+
+      BitBlt(hdcCompatible,
+               0,0,
+               500, 500,
+               hdcScreen,
+               0,0,
+               SRCCOPY);
+
+      RECT outRect;
+
+      outRect.top    = expression->getBBoxTop();
+      outRect.bottom = expression->getBBoxBottom();
+      outRect.left   = expression->getBBoxLeft();
+      outRect.right  = expression->getBBoxRight();
+
+      outRect.top    = 0;
+      outRect.bottom = 200;
+      outRect.left   = 0;
+      outRect.right  = 400;
+      WriteImage("image.bmp", outRect);
+      //
+
       break;
     }
     break;
@@ -150,3 +185,93 @@ LRESULT CALLBACK MainWndProc(
   UpdateWindow (hMainWnd);
   return 0;
 }
+
+VOID WriteImage (CHAR* pstrPath, RECT outRect)
+{
+  HBITMAP hSnapshot;
+
+
+  if ((hSnapshot = MakeClientSnapshot (outRect)) != NULL) {
+  	UINT uiBytesPerRow = 3 * (outRect.right - outRect.left); // RGB takes 24 bits
+  	UINT uiRemainderForPadding;
+
+  	if ((uiRemainderForPadding = uiBytesPerRow % sizeof (DWORD)) > 0) {
+  		uiBytesPerRow += (sizeof (DWORD) - uiRemainderForPadding);
+  		}
+
+  	UINT uiBytesPerAllRows = uiBytesPerRow * (outRect.bottom - outRect.top);
+  	PBYTE pDataBits;
+
+  	if ((pDataBits = new BYTE [uiBytesPerAllRows]) != NULL) {
+  		BITMAPINFOHEADER bmi = {0};
+  		BITMAPFILEHEADER bmf = {0};
+  		HDC hDC = GetDC (hMainWnd);
+
+  		// Prepare to get the data out of HBITMAP:
+  		bmi.biSize = sizeof (bmi);
+  		bmi.biPlanes = 1;
+  		bmi.biBitCount = 24;
+  		bmi.biHeight = outRect.bottom - outRect.top;
+  		bmi.biWidth = outRect.right - outRect.left;
+
+  		// Get it:
+  		GetDIBits (hDC, hSnapshot, outRect.top, outRect.bottom - outRect.top,
+  			pDataBits, (BITMAPINFO*) &bmi, DIB_RGB_COLORS);
+
+  		ReleaseDC (hMainWnd, hDC);
+
+  		// Fill the file header:
+  		bmf.bfOffBits = sizeof (bmf) + sizeof (bmi);
+  		bmf.bfSize = bmf.bfOffBits + uiBytesPerAllRows;
+  		bmf.bfType = 0x4D42;
+
+  		// Writing:
+  		FILE* pFile;
+
+  		if ((pFile = fopen (pstrPath, "wb")) != NULL) {
+  			fwrite (&bmf, sizeof (bmf), 1, pFile);
+  			fwrite (&bmi, sizeof (bmi), 1, pFile);
+  			fwrite (pDataBits, sizeof (BYTE), uiBytesPerAllRows, pFile);
+  			fclose (pFile);
+  			}
+  		delete [] pDataBits;
+  		}
+  	DeleteObject (hSnapshot);
+  	}
+}
+
+HBITMAP MakeClientSnapshot (RECT& rcClient) {
+      HDC hDC = GetDC (hMainWnd);
+      //RECT rcClient;
+      BOOL bOk = FALSE;
+      HBITMAP hImage = NULL;
+
+      //GetClientRect (hMainWnd, &rcClient);
+      //client = rcClient;
+      if ((hImage = CreateCompatibleBitmap (hDC,
+          rcClient.right - rcClient.left,
+          rcClient.bottom - rcClient.top)) != NULL) {
+
+        HDC hMemDC;
+        HBITMAP hDCBmp;
+
+        if ((hMemDC = CreateCompatibleDC (hDC)) != NULL) {
+          hDCBmp = (HBITMAP) SelectObject (hMemDC, hImage);
+
+          BitBlt (hMemDC, rcClient.left, rcClient.top, rcClient.right - rcClient.left, rcClient.bottom - rcClient.top,
+            hDC, 0, 0, SRCCOPY);
+
+          SelectObject (hMemDC, hDCBmp);
+          DeleteDC (hMemDC);
+          bOk = TRUE;
+          }
+        }
+      ReleaseDC (hMainWnd, hDC);
+      if (! bOk) {
+        if (hImage) {
+          DeleteObject (hImage);
+          hImage = NULL;
+          }
+        }
+      return hImage;
+      }
