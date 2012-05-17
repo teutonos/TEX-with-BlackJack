@@ -1,6 +1,7 @@
 #include <windows.h>
 #include <string>
 #include "tex.h"
+//проверка коммита
 // объявление функций
 LRESULT CALLBACK MainWndProc(HWND, UINT, WPARAM, LPARAM);
 ATOM RegMyWindowClass(HINSTANCE, LPCTSTR);
