@@ -1,3 +1,5 @@
-1 \over {1 + 1 \over {1 + 1 \over {1 + ...}}}
+a_0 + 1 \over {a_1 + 1 \over {a_2 + ...}}
 
-\int_0^{1 \over 2} {2xdx \over {x^2-1}} = ln|x^2-1|{}|_0^{1 \over 2} = ln({3 \over 4})
+\int_0^{1 \over 2} {2xdx \over {x^2-1}} = 
+ln|x^2-1|{}|_0^{1 \over 2} = ln({3 \over 4})
+
