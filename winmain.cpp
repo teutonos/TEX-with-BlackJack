@@ -194,6 +194,7 @@ LRESULT CALLBACK MainWndProc(
           }
 
           char* fname;
+          CreateDirectory("images", NULL);
           fname = GetFileName();
           WriteImage(fname, outRect);
           delete [] fname;
